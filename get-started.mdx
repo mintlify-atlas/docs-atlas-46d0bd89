@@ -1,0 +1,218 @@
+---
+title: "Get started"
+description: "Install the .NET MAUI Community Toolkit, initialize it in MauiProgram.cs, and use your first control."
+---
+
+## Prerequisites
+
+- .NET 10 SDK (`10.0.100` or later with `rollForward: latestFeature`)
+- A .NET MAUI project targeting iOS 15+, Android 21+, macOS Catalyst 15+, Windows 10.0.17763+, or Tizen 6.5+
+
+## Installation and setup
+
+<Steps>
+  <Step title="Install the core package">
+    Add `CommunityToolkit.Maui` to your .NET MAUI project using the .NET CLI:
+
+    ```bash
+    dotnet add package CommunityToolkit.Maui
+    ```
+
+    This single package provides controls, behaviors, converters, layouts, essentials, and extensions. The packages below are optional and only needed for their specific features.
+
+    <Tabs>
+      <Tab title="MediaElement">
+        Add audio and video playback support:
+
+        ```bash
+        dotnet add package CommunityToolkit.Maui.MediaElement
+        ```
+      </Tab>
+      <Tab title="Camera">
+        Add live camera preview and capture:
+
+        ```bash
+        dotnet add package CommunityToolkit.Maui.Camera
+        ```
+      </Tab>
+      <Tab title="Maps">
+        Add the enhanced Windows map control:
+
+        ```bash
+        dotnet add package CommunityToolkit.Maui.Maps
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Initialize the toolkit in MauiProgram.cs">
+    Call `UseMauiCommunityToolkit()` on your `MauiAppBuilder` before calling `builder.Build()`:
+
+    ```csharp MauiProgram.cs
+    using CommunityToolkit.Maui;
+
+    public static class MauiProgram
+    {
+        public static MauiApp CreateMauiApp()
+        {
+            var builder = MauiApp.CreateBuilder();
+            builder
+                .UseMauiApp<App>()
+                // Initialize the .NET MAUI Community Toolkit
+                .UseMauiCommunityToolkit()
+                // After initializing the toolkit, optionally configure fonts
+                .ConfigureFonts(fonts =>
+                {
+                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                    fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                });
+
+            return builder.Build();
+        }
+    }
+    ```
+
+    `UseMauiCommunityToolkit()` registers the `IPopupService` singleton, configures `DrawingViewHandler` and `SemanticOrderViewHandler`, and initializes `CommunityToolkit.Maui.Core`.
+  </Step>
+
+  <Step title="Configure options (optional)">
+    Pass an `Action<Options>` to `UseMauiCommunityToolkit()` to customize toolkit behavior at startup. All options default to `false`.
+
+    ```csharp MauiProgram.cs
+    using CommunityToolkit.Maui;
+
+    builder.UseMauiCommunityToolkit(options =>
+    {
+        // Return the DefaultConvertReturnValue instead of throwing when a converter fails
+        options.SetShouldSuppressExceptionsInConverters(true);
+
+        // Report animation exceptions to Trace instead of throwing
+        options.SetShouldSuppressExceptionsInAnimations(true);
+
+        // Report behavior exceptions to Trace instead of throwing
+        options.SetShouldSuppressExceptionsInBehaviors(true);
+
+        // Enable Snackbar on Windows (requires Package.appxmanifest changes)
+        options.SetShouldEnableSnackbarOnWindows(true);
+    });
+    ```
+
+    <Warning>
+      `SetShouldEnableSnackbarOnWindows(true)` requires additional setup in your `Package.appxmanifest` file. See the Snackbar documentation for platform-specific initialization details.
+    </Warning>
+  </Step>
+
+  <Step title="Initialize optional packages">
+    If you installed any of the optional packages, register them in the same `MauiProgram.cs` file.
+
+    <Tabs>
+      <Tab title="MediaElement">
+        Call `UseMauiCommunityToolkitMediaElement()` and pass a boolean to control the Android foreground service:
+
+        ```csharp MauiProgram.cs
+        using CommunityToolkit.Maui;
+
+        builder
+            .UseMauiApp<App>()
+            .UseMauiCommunityToolkit()
+            .UseMauiCommunityToolkitMediaElement(
+                isAndroidForegroundServiceEnabled: true
+            );
+        ```
+
+        When `isAndroidForegroundServiceEnabled` is `true`, the following Android permissions are automatically added to the manifest: `FOREGROUND_SERVICE`, `MEDIA_CONTENT_CONTROL`, `POST_NOTIFICATION`, `FOREGROUND_SERVICE_MEDIA_PLAYBACK`.
+
+        <Note>
+          MediaElement requires Android 26.0 (Android 8.0 Oreo) or higher. The minimum Android version for the core toolkit is Android 21.0.
+        </Note>
+      </Tab>
+      <Tab title="Camera">
+        Call `UseMauiCommunityToolkitCamera()`:
+
+        ```csharp MauiProgram.cs
+        using CommunityToolkit.Maui;
+
+        builder
+            .UseMauiApp<App>()
+            .UseMauiCommunityToolkit()
+            .UseMauiCommunityToolkitCamera();
+        ```
+
+        This registers `ICameraProvider` and `CameraViewHandler`. Camera is not supported on Tizen.
+      </Tab>
+      <Tab title="Maps">
+        Call `UseMauiCommunityToolkitMaps()` with your Bing Maps API key. On non-Windows platforms, use the built-in `UseMauiMaps()` instead:
+
+        ```csharp MauiProgram.cs
+        using CommunityToolkit.Maui.Maps;
+
+        builder
+            .UseMauiApp<App>()
+            .UseMauiCommunityToolkit()
+        #if WINDOWS
+            .UseMauiCommunityToolkitMaps("YOUR_BING_MAPS_KEY")
+        #else
+            .UseMauiMaps()
+        #endif
+            ;
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
+
+  <Step title="Add the XAML namespace">
+    To use toolkit controls and behaviors in XAML, declare the toolkit namespace on your `ContentPage` or root element:
+
+    ```xml
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    ```
+
+    Full example on a `ContentPage`:
+
+    ```xml MainPage.xaml
+    <ContentPage
+        x:Class="MyApp.MainPage"
+        xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+        xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit">
+
+        <!-- toolkit controls and behaviors available here -->
+
+    </ContentPage>
+    ```
+  </Step>
+
+  <Step title="Show a Toast notification">
+    `Toast` is one of the simplest toolkit features. Call it from any page's code-behind to verify your setup is working:
+
+    ```csharp MainPage.xaml.cs
+    using CommunityToolkit.Maui.Alerts;
+    using CommunityToolkit.Maui.Core;
+
+    private async void OnCounterClicked(object sender, EventArgs e)
+    {
+        var toast = Toast.Make("Toolkit is working!", ToastDuration.Short, 14);
+        await toast.Show();
+    }
+    ```
+
+    If the Toast appears, the toolkit is correctly initialized. You can now explore [Controls](/controls/popup), [Behaviors](/behaviors/overview), [Converters](/converters/overview), and more.
+  </Step>
+</Steps>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Controls" icon="window" href="/controls/popup">
+    Explore Popup, DrawingView, AvatarView, Expander, RatingView, MediaElement, CameraView, and Maps.
+  </Card>
+  <Card title="Behaviors" icon="bolt" href="/behaviors/overview">
+    Attach reusable logic to any view with TouchBehavior, EventToCommandBehavior, validation behaviors, and more.
+  </Card>
+  <Card title="Converters" icon="arrows-left-right" href="/converters/overview">
+    Simplify XAML data binding with 30+ built-in value converters.
+  </Card>
+  <Card title="Upgrade guide" icon="arrow-up-circle" href="/upgrade-guide">
+    Already using the toolkit? Follow the upgrade guide when moving between major versions.
+  </Card>
+</CardGroup>

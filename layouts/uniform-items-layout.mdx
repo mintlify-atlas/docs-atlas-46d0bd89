@@ -1,0 +1,56 @@
+---
+title: "UniformItemsLayout"
+description: "A Grid-like layout where every cell has the same width and height."
+---
+
+`UniformItemsLayout` arranges its children in a grid where every cell has the same width and height. Unlike `Grid`, you don't need to define rows and columns — the layout calculates them based on the number of columns (or rows) you specify and the number of children.
+
+## Basic usage
+
+```xml
+xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+
+<toolkit:UniformItemsLayout MaxColumns="3" Spacing="8">
+  <BoxView Color="Red" HeightRequest="60" />
+  <BoxView Color="Green" HeightRequest="60" />
+  <BoxView Color="Blue" HeightRequest="60" />
+  <BoxView Color="Yellow" HeightRequest="60" />
+  <BoxView Color="Orange" HeightRequest="60" />
+  <BoxView Color="Purple" HeightRequest="60" />
+</toolkit:UniformItemsLayout>
+```
+
+This produces a 3-column grid of equal-size cells.
+
+## Properties
+
+<ParamField path="MaxColumns" type="int">
+  Maximum number of columns. Children wrap to the next row when this limit is reached. Default: `int.MaxValue` (single row).
+</ParamField>
+
+<ParamField path="MaxRows" type="int">
+  Maximum number of rows. Children wrap to the next column when this limit is reached. Default: `int.MaxValue` (single column).
+</ParamField>
+
+## With data binding
+
+`UniformItemsLayout` works naturally with `BindableLayout`:
+
+```xml
+<toolkit:UniformItemsLayout MaxColumns="2" Spacing="12">
+  <BindableLayout.ItemTemplate>
+    <DataTemplate>
+      <Frame Padding="16" CornerRadius="8">
+        <Label Text="{Binding Title}" />
+      </Frame>
+    </DataTemplate>
+  </BindableLayout.ItemTemplate>
+  <BindableLayout.ItemsSource>
+    <x:Binding Path="Items" />
+  </BindableLayout.ItemsSource>
+</toolkit:UniformItemsLayout>
+```
+
+<Tip>
+  Use `MaxColumns` for horizontally-oriented layouts (like card grids) and `MaxRows` for vertically-oriented layouts.
+</Tip>

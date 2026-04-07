@@ -1,0 +1,67 @@
+---
+title: "Animations"
+description: "BaseAnimation and FadeAnimation for use with AnimationBehavior."
+---
+
+The toolkit provides a small but extensible animation framework built around the `BaseAnimation` abstract class. These animations are designed to work with [`AnimationBehavior`](/behaviors/animation-behavior).
+
+## BaseAnimation
+
+`BaseAnimation` is the abstract base class for all toolkit animations. Implement it to create custom animations:
+
+```csharp
+public class ScaleAnimation : BaseAnimation
+{
+    public double ScaleTo { get; set; } = 1.2;
+
+    public override async Task Animate(VisualElement view, CancellationToken token)
+    {
+        token.ThrowIfCancellationRequested();
+
+        await view.ScaleTo(ScaleTo, (uint)Duration, Easing);
+        await view.ScaleTo(1.0, (uint)Duration, Easing);
+    }
+}
+```
+
+### BaseAnimation properties
+
+<ParamField path="Duration" type="int">
+  Duration of the animation in milliseconds. Default: `250`.
+</ParamField>
+
+<ParamField path="Easing" type="Easing?">
+  The easing function applied during the animation. Default: `null` (linear).
+</ParamField>
+
+## FadeAnimation
+
+`FadeAnimation` is the built-in animation that fades a `VisualElement`'s opacity to a target value and back.
+
+```xml
+<toolkit:AnimationBehavior AnimateOnTap="True">
+  <toolkit:AnimationBehavior.AnimationType>
+    <toolkit:FadeAnimation Opacity="0.3" Duration="400" />
+  </toolkit:AnimationBehavior.AnimationType>
+</toolkit:AnimationBehavior>
+```
+
+<ParamField path="Opacity" type="double">
+  The target opacity during the animation (before returning to 1.0). Default: `0.3`.
+</ParamField>
+
+<ParamField path="Duration" type="uint">
+  Duration in milliseconds for each fade direction. Default: `250`.
+</ParamField>
+
+<ParamField path="Easing" type="Easing?">
+  Easing function to apply.
+</ParamField>
+
+## Using animations with AnimationBehavior
+
+See the [AnimationBehavior](/behaviors/animation-behavior) page for full usage including event-triggered and command-triggered animations.
+
+<Tip>
+  You can define custom animations by subclassing `BaseAnimation` and overriding `Animate(VisualElement, CancellationToken)`. Reference any .NET MAUI animation API (`ScaleTo`, `FadeTo`, `TranslateTo`, `RotateTo`, etc.) inside `Animate`.
+</Tip>

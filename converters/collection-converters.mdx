@@ -1,0 +1,133 @@
+---
+title: "Collection Converters"
+description: "Check collection state, access items by index, and convert between lists and strings."
+---
+
+## IsListNullOrEmptyConverter
+
+Returns `true` when the collection is `null` or contains no elements.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:IsListNullOrEmptyConverter x:Key="IsListEmpty" />
+</ContentPage.Resources>
+
+<Label
+  IsVisible="{Binding Items, Converter={StaticResource IsListEmpty}}"
+  Text="No items found." />
+```
+
+---
+
+## IsListNotNullOrEmptyConverter
+
+Returns `true` when the collection is not `null` and contains at least one element.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:IsListNotNullOrEmptyConverter x:Key="IsListNotEmpty" />
+</ContentPage.Resources>
+
+<CollectionView
+  IsVisible="{Binding Items, Converter={StaticResource IsListNotEmpty}}"
+  ItemsSource="{Binding Items}" />
+```
+
+---
+
+## IndexToArrayItemConverter
+
+Returns the element at the specified index from an array or list. Pass the index as the `ConverterParameter`.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:IndexToArrayItemConverter x:Key="ItemAtIndex" />
+</ContentPage.Resources>
+
+<!-- Bind to a string[] and retrieve the item at index 2 -->
+<Label Text="{Binding Categories, Converter={StaticResource ItemAtIndex}, ConverterParameter=2}" />
+```
+
+---
+
+## StringToListConverter
+
+Splits a string into a `List<string>` using a configurable separator.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:StringToListConverter x:Key="CsvToList" Separator="," />
+</ContentPage.Resources>
+
+<CollectionView ItemsSource="{Binding CsvTags, Converter={StaticResource CsvToList}}" />
+```
+
+<ParamField path="Separator" type="string">
+  The separator string to split on.
+</ParamField>
+
+<ParamField path="SplitOptions" type="StringSplitOptions">
+  Options such as `RemoveEmptyEntries`. Default: `StringSplitOptions.None`.
+</ParamField>
+
+---
+
+## ListToStringConverter
+
+Joins the elements of a collection into a delimited string.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:ListToStringConverter x:Key="ListJoin" Separator=" • " />
+</ContentPage.Resources>
+
+<Label Text="{Binding Tags, Converter={StaticResource ListJoin}}" />
+```
+
+<ParamField path="Separator" type="string">
+  The delimiter placed between each item. Default: `", "`.
+</ParamField>
+
+---
+
+## DoubleToIntConverter
+
+Converts a `double` to an `int` by truncating the decimal portion.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:DoubleToIntConverter x:Key="DoubleToInt" />
+</ContentPage.Resources>
+
+<Label Text="{Binding ProgressValue, Converter={StaticResource DoubleToInt}}" />
+```
+
+---
+
+## TimeSpanToSecondsConverter
+
+Converts a `TimeSpan` to its total seconds as a `double`, and back.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:TimeSpanToSecondsConverter x:Key="TimeToSeconds" />
+</ContentPage.Resources>
+
+<Slider
+  Value="{Binding MediaPosition, Converter={StaticResource TimeToSeconds}}"
+  Maximum="{Binding MediaDuration, Converter={StaticResource TimeToSeconds}}" />
+```
+
+---
+
+## DateTimeOffsetConverter
+
+Converts between `DateTime` and `DateTimeOffset`.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:DateTimeOffsetConverter x:Key="DateTimeOffset" />
+</ContentPage.Resources>
+
+<DatePicker Date="{Binding CreatedAt, Converter={StaticResource DateTimeOffset}}" />
+```

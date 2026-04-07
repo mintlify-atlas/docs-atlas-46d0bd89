@@ -1,97 +1,93 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: ".NET MAUI Community Toolkit"
+description: "A community-maintained collection of reusable controls, behaviors, converters, animations, and essentials for .NET MAUI developers."
 ---
 
-## Setting up
+The .NET MAUI Community Toolkit is a collection of common elements for development with .NET MAUI that developers tend to replicate across multiple apps. It simplifies and demonstrates common developer tasks when building apps with .NET MAUI for iOS, Android, macOS, Windows, and Tizen.
 
-Get your documentation site up and running in minutes.
-
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
-
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+<CardGroup cols={2}>
+  <Card title="Get Started" icon="rocket" href="/get-started">
+    Install the toolkit and add it to your .NET MAUI app in minutes.
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="Controls" icon="window" href="/controls/popup">
+    Popup, MediaElement, CameraView, DrawingView, AvatarView, and more.
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="Behaviors" icon="bolt" href="/behaviors/overview">
+    Touch, EventToCommand, Validation, Animation, and platform behaviors.
   </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
+  <Card title="Converters" icon="arrows-left-right" href="/converters/overview">
+    30+ value converters for XAML data binding — bool, string, color, enum, and more.
   </Card>
-</Columns>
+  <Card title="Layouts & Essentials" icon="table-cells" href="/layouts/dock-layout">
+    DockLayout, UniformItemsLayout, StateContainer, SpeechToText, FileSaver, and more.
+  </Card>
+  <Card title="Extensions & Animations" icon="wand-magic-sparkles" href="/extensions/overview">
+    Color animation extensions, SafeFireAndForget, and FadeAnimation helpers.
+  </Card>
+</CardGroup>
 
-## Create beautiful pages
+## Quick install
 
-Everything you need to create world-class documentation.
+<Steps>
+  <Step title="Install the NuGet packages">
+    Add the packages you need to your .NET MAUI project:
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+    ```bash
+    dotnet add package CommunityToolkit.Maui
+    dotnet add package CommunityToolkit.Maui.MediaElement
+    dotnet add package CommunityToolkit.Maui.Camera
+    dotnet add package CommunityToolkit.Maui.Maps
+    ```
+  </Step>
+  <Step title="Initialize in MauiProgram.cs">
+    Call `UseMauiCommunityToolkit()` on your `MauiAppBuilder`:
 
-## Need inspiration?
+    ```csharp MauiProgram.cs
+    using CommunityToolkit.Maui;
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+    public static class MauiProgram
+    {
+        public static MauiApp CreateMauiApp()
+        {
+            var builder = MauiApp.CreateBuilder();
+            builder
+                .UseMauiApp<App>()
+                .UseMauiCommunityToolkit();
+
+            return builder.Build();
+        }
+    }
+    ```
+  </Step>
+  <Step title="Add the XAML namespace">
+    Reference toolkit controls and behaviors in your XAML pages:
+
+    ```xml
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    ```
+  </Step>
+  <Step title="Use the toolkit">
+    You're ready to use controls, behaviors, converters, and more across your app. See the [Controls](/controls/popup) section for detailed usage examples.
+  </Step>
+</Steps>
+
+## Available packages
+
+<CardGroup cols={2}>
+  <Card title="CommunityToolkit.Maui" icon="box" href="/get-started">
+    Core package — controls, behaviors, converters, layouts, essentials, and extensions.
+  </Card>
+  <Card title="CommunityToolkit.Maui.MediaElement" icon="film" href="/controls/mediaelement">
+    Cross-platform audio and video playback control.
+  </Card>
+  <Card title="CommunityToolkit.Maui.Camera" icon="camera" href="/controls/cameraview">
+    Live camera capture and photo/video recording.
+  </Card>
+  <Card title="CommunityToolkit.Maui.Maps" icon="map" href="/controls/maps">
+    Enhanced map control built on top of .NET MAUI Maps.
+  </Card>
+</CardGroup>
+
+<Note>
+  All features are contributed by the .NET community and maintained by a core set of maintainers. Features added to the toolkit may one day be promoted into the official .NET MAUI library.
+</Note>

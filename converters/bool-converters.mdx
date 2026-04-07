@@ -1,0 +1,199 @@
+---
+title: "Bool Converters"
+description: "BoolToObjectConverter, InvertedBoolConverter, IntToBoolConverter, MultiConverter, VariableMultiValueConverter, and MathExpressionConverter."
+---
+
+## BoolToObjectConverter
+
+Returns one of two objects depending on whether the bound value is `true` or `false`.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:BoolToObjectConverter x:Key="BoolToColor" TrueObject="Green" FalseObject="Red" />
+</ContentPage.Resources>
+
+<Label TextColor="{Binding IsActive, Converter={StaticResource BoolToColor}}" Text="Status" />
+```
+
+<ParamField path="TrueObject" type="object?">
+  The value returned when the binding value is `true`.
+</ParamField>
+
+<ParamField path="FalseObject" type="object?">
+  The value returned when the binding value is `false`.
+</ParamField>
+
+---
+
+## InvertedBoolConverter
+
+Inverts a `bool` value — `true` becomes `false` and vice versa.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:InvertedBoolConverter x:Key="InvertBool" />
+</ContentPage.Resources>
+
+<ActivityIndicator IsRunning="{Binding IsLoading}" />
+<Button IsVisible="{Binding IsLoading, Converter={StaticResource InvertBool}}" Text="Retry" />
+```
+
+---
+
+## IntToBoolConverter
+
+Returns `true` when the integer value is non-zero, `false` when it is zero.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:IntToBoolConverter x:Key="IntToBool" />
+</ContentPage.Resources>
+
+<Label IsVisible="{Binding ErrorCount, Converter={StaticResource IntToBool}}" Text="Has errors" />
+```
+
+---
+
+## StateToBooleanConverter
+
+Converts a `LayoutState` enum value to a `bool` for use with `StateContainer`.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:StateToBooleanConverter x:Key="IsLoadingState" StateToCompare="Loading" />
+</ContentPage.Resources>
+
+<ActivityIndicator IsRunning="{Binding CurrentState, Converter={StaticResource IsLoadingState}}" />
+```
+
+<ParamField path="StateToCompare" type="LayoutState">
+  The `LayoutState` value to compare against. Returns `true` when they match.
+</ParamField>
+
+---
+
+## IsEqualConverter / IsNotEqualConverter
+
+Returns `true`/`false` based on equality comparison with a parameter.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:IsEqualConverter x:Key="IsEqual" />
+</ContentPage.Resources>
+
+<Label IsVisible="{Binding Status, Converter={StaticResource IsEqual}, ConverterParameter='Active'}" />
+```
+
+---
+
+## IsNullConverter / IsNotNullConverter
+
+Returns `true` when the value is null (or not null).
+
+```xml
+<ContentPage.Resources>
+  <toolkit:IsNullConverter x:Key="IsNull" />
+  <toolkit:IsNotNullConverter x:Key="IsNotNull" />
+</ContentPage.Resources>
+
+<Label IsVisible="{Binding SelectedItem, Converter={StaticResource IsNull}}" Text="Nothing selected" />
+<Label IsVisible="{Binding SelectedItem, Converter={StaticResource IsNotNull}}" Text="Item selected" />
+```
+
+---
+
+## CompareConverter
+
+Compares a value to a parameter using a configurable operator.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:CompareConverter x:Key="GreaterThan"
+    ComparisonOperator="Greater"
+    ComparingValue="10" />
+</ContentPage.Resources>
+
+<Label IsVisible="{Binding Score, Converter={StaticResource GreaterThan}}" Text="High score!" />
+```
+
+<ParamField path="ComparisonOperator" type="OperatorType">
+  The comparison operator: `Equal`, `NotEqual`, `Smaller`, `SmallerOrEqual`, `Greater`, `GreaterOrEqual`.
+</ParamField>
+
+<ParamField path="ComparingValue" type="IComparable?">
+  The value to compare against.
+</ParamField>
+
+---
+
+## IsInRangeConverter
+
+Returns `true` when a value falls within a specified range.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:IsInRangeConverter x:Key="InRange" MinValue="1" MaxValue="100" />
+</ContentPage.Resources>
+
+<Label IsVisible="{Binding Age, Converter={StaticResource InRange}}" Text="Valid age" />
+```
+
+<ParamField path="MinValue" type="object?">
+  The minimum value (inclusive).
+</ParamField>
+
+<ParamField path="MaxValue" type="object?">
+  The maximum value (inclusive).
+</ParamField>
+
+---
+
+## MultiConverter
+
+Chains multiple `IValueConverter` instances, passing output from one to the next.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:MultiConverter x:Key="InvertedBoolToColor">
+    <toolkit:InvertedBoolConverter />
+    <toolkit:BoolToObjectConverter TrueObject="Red" FalseObject="Green" />
+  </toolkit:MultiConverter>
+</ContentPage.Resources>
+
+<Label TextColor="{Binding IsValid, Converter={StaticResource InvertedBoolToColor}}" />
+```
+
+---
+
+## VariableMultiValueConverter
+
+Applies AND/OR logic across multiple boolean `MultiBinding` values.
+
+```xml
+<Label>
+  <Label.IsVisible>
+    <MultiBinding Converter="{toolkit:VariableMultiValueConverter ConditionType=All}">
+      <Binding Path="IsLoggedIn" />
+      <Binding Path="HasPermission" />
+    </MultiBinding>
+  </Label.IsVisible>
+</Label>
+```
+
+<ParamField path="ConditionType" type="MultiBindingCondition">
+  `All` — all values must be `true`. `Any` — at least one value must be `true`. `None` — all values must be `false`.
+</ParamField>
+
+---
+
+## MathExpressionConverter
+
+Evaluates a mathematical expression string. The bound value is substituted as `x`.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:MathExpressionConverter x:Key="MathConverter" />
+</ContentPage.Resources>
+
+<Label Text="{Binding Progress, Converter={StaticResource MathConverter}, ConverterParameter='x * 100'}" />
+```

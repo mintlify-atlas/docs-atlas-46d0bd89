@@ -1,0 +1,128 @@
+---
+title: "SpeechToText"
+description: "Convert speech to text in real time using online or offline recognition."
+---
+
+The toolkit provides two speech-to-text implementations:
+
+- **`SpeechToText`** — uses the platform's online speech recognition service
+- **`OfflineSpeechToText`** — uses on-device recognition (no network required)
+
+Both implement `ISpeechToText` and are registered as singleton services.
+
+## Setup
+
+```csharp MauiProgram.cs
+using CommunityToolkit.Maui;
+
+public static class MauiProgram
+{
+    public static MauiApp CreateMauiApp()
+    {
+        var builder = MauiApp.CreateBuilder();
+        builder
+            .UseMauiApp<App>()
+            .UseMauiCommunityToolkit();
+
+        return builder.Build();
+    }
+}
+```
+
+Inject `ISpeechToText` into your ViewModel or page:
+
+```csharp
+public class MyViewModel
+{
+    readonly ISpeechToText speechToText;
+
+    public MyViewModel(ISpeechToText speechToText)
+    {
+        this.speechToText = speechToText;
+    }
+}
+```
+
+## Request permissions
+
+Always request microphone permissions before starting recognition:
+
+```csharp
+var isGranted = await speechToText.RequestPermissions(CancellationToken.None);
+if (!isGranted)
+{
+    // Handle permission denied
+    return;
+}
+```
+
+## Start and stop listening
+
+```csharp
+// Subscribe to real-time updates
+speechToText.RecognitionResultUpdated += (s, e) =>
+{
+    PartialText = e.RecognitionResult;
+};
+
+// Subscribe to final result
+speechToText.RecognitionResultCompleted += (s, e) =>
+{
+    FinalText = e.RecognitionResult;
+};
+
+// Start recognition
+await speechToText.StartListenAsync(
+    new SpeechToTextOptions
+    {
+        Culture = CultureInfo.GetCultureInfo("en-US"),
+        ShouldReportPartialResults = true
+    },
+    CancellationToken.None);
+
+// Stop recognition
+await speechToText.StopListenAsync(CancellationToken.None);
+```
+
+## SpeechToTextOptions
+
+<ParamField path="Culture" type="CultureInfo">
+  The language/locale to use for recognition. Default: `CultureInfo.CurrentCulture`.
+</ParamField>
+
+<ParamField path="ShouldReportPartialResults" type="bool">
+  When `true`, `RecognitionResultUpdated` fires with partial transcriptions as you speak. Default: `false`.
+</ParamField>
+
+## Events
+
+| Event | Args | Description |
+|---|---|---|
+| `RecognitionResultUpdated` | `SpeechToTextRecognitionResultUpdatedEventArgs` | Fires with partial results during recognition |
+| `RecognitionResultCompleted` | `SpeechToTextRecognitionResultCompletedEventArgs` | Fires with the final result when recognition completes |
+| `StateChanged` | `SpeechToTextStateChangedEventArgs` | Fires when `CurrentState` changes |
+
+## OfflineSpeechToText
+
+`OfflineSpeechToText` uses on-device models and requires no internet connection. The API is identical to `SpeechToText`. Inject `IOfflineSpeechToText` instead:
+
+```csharp
+public MyViewModel(IOfflineSpeechToText offlineSpeechToText)
+{
+    this.offlineSpeechToText = offlineSpeechToText;
+}
+```
+
+<Warning>
+  Offline speech recognition availability depends on the platform and installed language packs. On Android and iOS, the device must have the relevant language model downloaded.
+</Warning>
+
+## Platform support
+
+| Platform | SpeechToText | OfflineSpeechToText |
+|---|---|---|
+| iOS | Yes | Yes (iOS 13+) |
+| Android | Yes | Yes |
+| macOS Catalyst | Yes | Yes |
+| Windows | Yes | Yes |
+| Tizen | No | No |

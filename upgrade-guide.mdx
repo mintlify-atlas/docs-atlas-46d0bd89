@@ -1,0 +1,167 @@
+---
+title: "Upgrade guide"
+description: "Steps and considerations for upgrading the .NET MAUI Community Toolkit to a newer major version."
+---
+
+This guide covers the general process for upgrading between major versions of the .NET MAUI Community Toolkit. Breaking changes between versions are documented on the [GitHub Releases page](https://github.com/CommunityToolkit/Maui/releases).
+
+<Warning>
+  Always review the release notes on GitHub before upgrading. Major versions may include breaking changes to initialization, APIs, or platform requirements.
+</Warning>
+
+## Upgrade steps
+
+<Steps>
+  <Step title="Update the NuGet packages">
+    Update each toolkit package you have installed to the latest version using the .NET CLI:
+
+    ```bash
+    dotnet add package CommunityToolkit.Maui
+    ```
+
+    If you use optional packages, update them as well:
+
+    ```bash
+    dotnet add package CommunityToolkit.Maui.MediaElement
+    dotnet add package CommunityToolkit.Maui.Camera
+    dotnet add package CommunityToolkit.Maui.Maps
+    ```
+
+    You can also update packages in Visual Studio via **NuGet Package Manager**, or in JetBrains Rider via **Manage NuGet Packages**.
+  </Step>
+
+  <Step title="Verify platform minimum versions">
+    Confirm your project's `SupportedOSPlatformVersion` values meet the requirements for the version you are upgrading to. The current minimum versions are:
+
+    | Platform       | Minimum version                    |
+    | -------------- | ---------------------------------- |
+    | iOS            | 15.0                               |
+    | macOS Catalyst | 15.0                               |
+    | Android        | 21.0 (core), 26.0 (MediaElement)   |
+    | Windows        | 10.0.17763                         |
+    | Tizen          | 6.5 (not supported by Camera)      |
+
+    These values are set in your `.csproj` file:
+
+    ```xml MyApp.csproj
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
+    ```
+  </Step>
+
+  <Step title="Re-check initialization in MauiProgram.cs">
+    After updating packages, verify your `MauiProgram.cs` initialization. Extension method signatures and the `Options` API can change between major versions. The current signatures are:
+
+    ```csharp MauiProgram.cs
+    // Core package — Action<Options> is optional
+    builder.UseMauiCommunityToolkit(options => { ... });
+
+    // MediaElement — isAndroidForegroundServiceEnabled is required
+    builder.UseMauiCommunityToolkitMediaElement(isAndroidForegroundServiceEnabled: true);
+
+    // Camera — no parameters
+    builder.UseMauiCommunityToolkitCamera();
+
+    // Maps — API key string is required
+    builder.UseMauiCommunityToolkitMaps("YOUR_BING_MAPS_KEY");
+    ```
+
+    If a method signature has changed, the compiler will report an error pointing to the affected call site.
+  </Step>
+
+  <Step title="Review Options API changes">
+    The `Options` class controls optional toolkit behavior. Check that any options you set still exist and have the same semantics. Current available options:
+
+    <AccordionGroup>
+      <Accordion title="SetShouldSuppressExceptionsInConverters">
+        When `true`, converters return `DefaultConvertReturnValue` instead of throwing an exception. Default: `false`.
+
+        ```csharp
+        options.SetShouldSuppressExceptionsInConverters(true);
+        ```
+      </Accordion>
+      <Accordion title="SetShouldSuppressExceptionsInAnimations">
+        When `true`, animation exceptions are reported to `System.Diagnostics.Trace` instead of being thrown. Default: `false`.
+
+        ```csharp
+        options.SetShouldSuppressExceptionsInAnimations(true);
+        ```
+      </Accordion>
+      <Accordion title="SetShouldSuppressExceptionsInBehaviors">
+        When `true`, behavior exceptions are reported to `System.Diagnostics.Trace` instead of being thrown. Default: `false`.
+
+        ```csharp
+        options.SetShouldSuppressExceptionsInBehaviors(true);
+        ```
+      </Accordion>
+      <Accordion title="SetShouldEnableSnackbarOnWindows">
+        When `true`, enables `Snackbar` on Windows using `AppNotificationManager`. Requires `Package.appxmanifest` changes. Must be called through `UseMauiCommunityToolkit()`, not standalone. Default: `false`.
+
+        ```csharp
+        options.SetShouldEnableSnackbarOnWindows(true);
+        ```
+      </Accordion>
+      <Accordion title="SetPopupDefaults / SetPopupOptionsDefaults">
+        Set global default settings for `Popup` and `PopupOptions` that apply to every new popup instance.
+
+        ```csharp
+        options.SetPopupDefaults(new DefaultPopupSettings { ... });
+        options.SetPopupOptionsDefaults(new DefaultPopupOptionsSettings { ... });
+        ```
+      </Accordion>
+    </AccordionGroup>
+  </Step>
+
+  <Step title="Rebuild and test">
+    Run a clean build to surface any remaining compile-time errors:
+
+    ```bash
+    dotnet build --no-incremental
+    ```
+
+    Fix any errors related to renamed or removed types, changed namespaces, or modified method signatures. Then run your app on each target platform to catch runtime regressions.
+  </Step>
+</Steps>
+
+## Common migration patterns
+
+<AccordionGroup>
+  <Accordion title="Namespace changes">
+    If a type is no longer found after upgrading, check whether its namespace has changed. All core toolkit types live under `CommunityToolkit.Maui`. MediaElement types live under `CommunityToolkit.Maui.Views`, Camera types under `CommunityToolkit.Maui.Views`, and Maps types under `CommunityToolkit.Maui.Maps`.
+  </Accordion>
+  <Accordion title="Handler registration removed or renamed">
+    `UseMauiCommunityToolkit()` registers `DrawingViewHandler` and `SemanticOrderViewHandler` automatically. If you previously registered these manually, remove the duplicate registrations to avoid conflicts.
+  </Accordion>
+  <Accordion title="Snackbar on Windows setup">
+    If you enable Snackbar on Windows (`SetShouldEnableSnackbarOnWindows(true)`), the call must be made through the `UseMauiCommunityToolkit(options => ...)` overload. Calling it outside of that context throws an `InvalidOperationException`.
+  </Accordion>
+  <Accordion title="MediaElement Android foreground service">
+    `UseMauiCommunityToolkitMediaElement` now requires an explicit `isAndroidForegroundServiceEnabled` boolean parameter. If you previously used an overload without this parameter, add the argument explicitly and review which Android permissions you need.
+  </Accordion>
+  <Accordion title="Maps on non-Windows platforms">
+    `UseMauiCommunityToolkitMaps()` only registers a handler on Windows. For all other platforms, call `UseMauiMaps()` from the base .NET MAUI library. Use a preprocessor directive to select the correct method:
+
+    ```csharp
+    #if WINDOWS
+        .UseMauiCommunityToolkitMaps("YOUR_BING_MAPS_KEY")
+    #else
+        .UseMauiMaps()
+    #endif
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Finding release notes
+
+All changelogs and breaking change notices are published on the GitHub Releases page:
+
+**https://github.com/CommunityToolkit/Maui/releases**
+
+Each release includes a list of new features, bug fixes, and any breaking changes with migration instructions.
+
+<Tip>
+  Watch the GitHub repository to receive notifications for new releases as soon as they are published.
+</Tip>

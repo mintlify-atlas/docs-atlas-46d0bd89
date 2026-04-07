@@ -1,0 +1,71 @@
+---
+title: "Extensions Overview"
+description: "Extension methods for color animations, popups, navigation, and image sources."
+---
+
+The toolkit includes a number of extension methods that extend .NET MAUI's built-in types with additional functionality.
+
+<CardGroup cols={2}>
+  <Card title="ColorAnimationExtensions" icon="paintbrush" href="/extensions/color-animation-extensions">
+    Animate a VisualElement's BackgroundColor smoothly to a target color.
+  </Card>
+  <Card title="Toast & Snackbar" icon="bell" href="/extensions/safe-fire-and-forget">
+    Display brief non-blocking notifications with optional action buttons.
+  </Card>
+</CardGroup>
+
+## All extensions at a glance
+
+| Extension class | Methods |
+|---|---|
+| `ColorAnimationExtensions` | `BackgroundColorTo()` |
+| `PopupExtensions` | `ShowPopupAsync<T>()`, `ShowPopup()`, `ClosePopupAsync()` |
+| `ServiceCollectionExtensions` | `AddTransientPopup<TPopup, TViewModel>()`, `AddScopedPopup<...>()`, `AddSingletonPopup<...>()` |
+| `NavigatedToEventArgsExtensions` | Extension methods for `NavigatedToEventArgs` |
+| `NavigatedFromEventArgsExtensions` | Extension methods for `NavigatedFromEventArgs` |
+| `PropertyChangedEventArgsExtensions` | `IsOneOf()` helper for property change checks |
+| `AppThemeObjectExtensions` | `GetBinding()` helpers for `AppThemeObject<T>` |
+| `WeakReferenceExtensions` | `GetTargetOrDefault()` safe target access |
+
+## Alerts
+
+| Class | Description |
+|---|---|
+| `Toast` | A brief timed message that auto-dismisses. Use `Toast.Make()` to create and `Show()` to display. |
+| `Snackbar` | A timed message with an optional action button. Use `Snackbar.Make()` to create. |
+
+See the [Toast & Snackbar](/extensions/safe-fire-and-forget) page for full usage examples.
+
+## GravatarImageSource
+
+`GravatarImageSource` is a `StreamImageSource` that fetches a profile avatar from [Gravatar](https://gravatar.com) using an email address.
+
+```xml
+<Image>
+  <Image.Source>
+    <toolkit:GravatarImageSource
+      Email="user@example.com"
+      Image="MysteryPerson"
+      CachingEnabled="True"
+      CacheValidity="1.00:00:00" />
+  </Image.Source>
+</Image>
+```
+
+```csharp
+var gravatarSource = new GravatarImageSource
+{
+    Email = "user@example.com",
+    Image = DefaultImage.MysteryPerson,
+    CachingEnabled = true,
+    CacheValidity = TimeSpan.FromDays(1)
+};
+myImage.Source = gravatarSource;
+```
+
+| Property | Type | Description |
+|---|---|---|
+| `Email` | `string?` | The email address whose Gravatar to load. |
+| `Image` | `DefaultImage` | The fallback image shown when no Gravatar exists for the email. |
+| `CachingEnabled` | `bool` | Whether to cache the downloaded image. Default: `true`. |
+| `CacheValidity` | `TimeSpan` | How long the cached image remains valid. Default: 1 day. |

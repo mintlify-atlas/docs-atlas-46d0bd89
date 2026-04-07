@@ -1,0 +1,85 @@
+---
+title: "Converters Overview"
+description: "30+ IValueConverter implementations for XAML data binding in .NET MAUI apps."
+---
+
+The .NET MAUI Community Toolkit includes over 30 value converters for common data binding scenarios. All converters are available through the toolkit XAML namespace after calling `UseMauiCommunityToolkit()`.
+
+```xml
+xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+```
+
+## Using converters in XAML
+
+Declare a converter as a resource and reference it in a binding:
+
+```xml
+<ContentPage.Resources>
+  <toolkit:InvertedBoolConverter x:Key="InvertBool" />
+</ContentPage.Resources>
+
+<Button IsVisible="{Binding IsLoggedIn, Converter={StaticResource InvertBool}}" />
+```
+
+<CardGroup cols={2}>
+  <Card title="Bool converters" icon="toggle-on" href="/converters/bool-converters">
+    BoolToObjectConverter, InvertedBoolConverter, IntToBoolConverter, StateToBooleanConverter
+  </Card>
+  <Card title="String converters" icon="font" href="/converters/string-converters">
+    IsStringNullOrEmpty, IsStringNotNullOrWhiteSpace, ListToStringConverter, TextCaseConverter, and more
+  </Card>
+  <Card title="Color converters" icon="palette" href="/converters/color-converters">
+    ColorToRgbString, ColorToHex, ColorToGray, ColorToComponent converters
+  </Card>
+  <Card title="Collection converters" icon="list" href="/converters/collection-converters">
+    IsListNullOrEmpty, IsListNotNullOrEmpty, IndexToArrayItemConverter, StringToListConverter
+  </Card>
+  <Card title="Enum converters" icon="code" href="/converters/enum-converters">
+    EnumToBoolConverter, EnumToIntConverter
+  </Card>
+  <Card title="Multi converters" icon="layer-group" href="/converters/bool-converters#multiconverter">
+    MultiConverter, VariableMultiValueConverter, MathExpressionConverter
+  </Card>
+</CardGroup>
+
+## Full converter list
+
+| Converter | Description |
+|---|---|
+| `BoolToObjectConverter` | Returns one of two objects based on a bool value |
+| `InvertedBoolConverter` | Inverts a bool value |
+| `IntToBoolConverter` | Returns `true` when int is non-zero |
+| `StateToBooleanConverter` | Converts `LayoutState` enum to bool |
+| `IsEqualConverter` | Returns `true` when value equals a parameter |
+| `IsNotEqualConverter` | Returns `true` when value does not equal a parameter |
+| `IsNullConverter` | Returns `true` when value is null |
+| `IsNotNullConverter` | Returns `true` when value is not null |
+| `IsInRangeConverter` | Returns `true` when value is within a range |
+| `CompareConverter` | Compares a value to a parameter with a given operator |
+| `IsStringNullOrEmptyConverter` | Returns `true` when string is null or empty |
+| `IsStringNotNullOrEmptyConverter` | Returns `true` when string is not null or empty |
+| `IsStringNullOrWhiteSpaceConverter` | Returns `true` when string is null or whitespace |
+| `IsStringNotNullOrWhiteSpaceConverter` | Returns `true` when string is not null or whitespace |
+| `IsListNullOrEmptyConverter` | Returns `true` when collection is null or empty |
+| `IsListNotNullOrEmptyConverter` | Returns `true` when collection is not null and not empty |
+| `ListToStringConverter` | Joins a list to a string with a separator |
+| `StringToListConverter` | Splits a string into a list |
+| `TextCaseConverter` | Converts text to upper, lower, or title case |
+| `IndexToArrayItemConverter` | Returns the item at a given index from an array |
+| `ItemTappedEventArgsConverter` | Extracts the tapped item from `ItemTappedEventArgs` |
+| `SelectedItemEventArgsConverter` | Extracts the selected item from `SelectedItemChangedEventArgs` |
+| `EnumToBoolConverter` | Returns `true` when enum equals a given value |
+| `EnumToIntConverter` | Converts an enum to its integer representation |
+| `ColorToRgbStringConverter` | Converts a `Color` to an RGB string |
+| `ColorToRgbaStringConverter` | Converts a `Color` to an RGBA string |
+| `ColorToHexRgbConverter` | Converts a `Color` to a hex string |
+| `ColorToGrayScaleColorConverter` | Converts a `Color` to its grayscale equivalent |
+| `ColorToComponentConverter` | Extracts a single RGBA component from a `Color` |
+| `ByteArrayToImageSourceConverter` | Converts a `byte[]` to an `ImageSource` |
+| `ImageResourceConverter` | Converts a resource name string to an `ImageSource` |
+| `DateTimeOffsetConverter` | Converts between `DateTime` and `DateTimeOffset` |
+| `DoubleToIntConverter` | Converts a `double` to an `int` |
+| `TimeSpanToSecondsConverter` | Converts a `TimeSpan` to seconds as a `double` |
+| `MathExpressionConverter` | Evaluates a math expression string |
+| `MultiConverter` | Chains multiple converters |
+| `VariableMultiValueConverter` | Applies AND/OR logic across multiple boolean bindings |

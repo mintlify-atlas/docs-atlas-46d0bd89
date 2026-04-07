@@ -1,0 +1,194 @@
+---
+title: 'Expander'
+description: 'A container view that shows a header and toggles the visibility of its content when the header is tapped.'
+---
+
+`Expander` is a layout container with a tappable header that shows or hides its content. It supports expanding up or down, nesting, command binding, and works correctly inside `CollectionView` and `ListView`.
+
+<Info>
+  `Expander` is part of the core `CommunityToolkit.Maui` NuGet package.
+</Info>
+
+## Installation
+
+<Steps>
+  <Step title="Install the NuGet package">
+    ```bash
+    dotnet add package CommunityToolkit.Maui
+    ```
+  </Step>
+  <Step title="Initialize the toolkit">
+    ```csharp
+    var builder = MauiApp.CreateBuilder();
+    builder
+        .UseMauiApp<App>()
+        .UseMauiCommunityToolkit();
+    ```
+  </Step>
+</Steps>
+
+## Usage
+
+### XAML — simple expander
+
+```xml
+<toolkit:Expander>
+    <toolkit:Expander.Header>
+        <Label Text="Tap to expand" FontSize="16" FontAttributes="Bold" />
+    </toolkit:Expander.Header>
+
+    <toolkit:Expander.Content>
+        <VerticalStackLayout>
+            <Label Text="Item 1" />
+            <Label Text="Item 2" />
+        </VerticalStackLayout>
+    </toolkit:Expander.Content>
+</toolkit:Expander>
+```
+
+### XAML — expand upward
+
+```xml
+<toolkit:Expander Direction="Up">
+    <toolkit:Expander.Header>
+        <Label Text="Tap me" FontSize="16" FontAttributes="Bold" />
+    </toolkit:Expander.Header>
+    <toolkit:Expander.Content>
+        <Label Text="Content appears above the header" />
+    </toolkit:Expander.Content>
+</toolkit:Expander>
+```
+
+### XAML — nested expanders
+
+```xml
+<toolkit:Expander Direction="Up">
+    <toolkit:Expander.Header>
+        <Label Text="Outer expander" FontSize="16" FontAttributes="Bold" />
+    </toolkit:Expander.Header>
+    <toolkit:Expander.Content>
+        <toolkit:Expander Direction="Down" BackgroundColor="LightGray">
+            <toolkit:Expander.Header>
+                <Label Text="Nested expander" FontSize="14" FontAttributes="Bold" />
+            </toolkit:Expander.Header>
+            <toolkit:Expander.Content>
+                <Label Text="Nested content" />
+            </toolkit:Expander.Content>
+        </toolkit:Expander>
+    </toolkit:Expander.Content>
+</toolkit:Expander>
+```
+
+### XAML — inside a `CollectionView`
+
+```xml
+<CollectionView ItemsSource="{Binding Items}">
+    <CollectionView.ItemTemplate>
+        <DataTemplate x:DataType="models:MyItem">
+            <toolkit:Expander ExpandedChanged="Expander_ExpandedChanged">
+                <toolkit:Expander.Header>
+                    <Label Text="{Binding Title}" />
+                </toolkit:Expander.Header>
+                <toolkit:Expander.Content>
+                    <Label Text="{Binding Description}" />
+                </toolkit:Expander.Content>
+            </toolkit:Expander>
+        </DataTemplate>
+    </CollectionView.ItemTemplate>
+</CollectionView>
+```
+
+### C# — programmatic control
+
+```csharp
+var expander = new Expander
+{
+    Direction = ExpandDirection.Down,
+    IsExpanded = false,
+    Header = new Label { Text = "Tap to expand" },
+    Content = new VerticalStackLayout
+    {
+        Children =
+        {
+            new Label { Text = "Item 1" },
+            new Label { Text = "Item 2" }
+        }
+    }
+};
+
+expander.ExpandedChanged += (sender, e) =>
+{
+    Console.WriteLine($"Expanded: {e.IsExpanded}");
+};
+
+// Expand programmatically
+expander.IsExpanded = true;
+```
+
+### C# — binding a command
+
+```csharp
+var expander = new Expander
+{
+    Header = new Label { Text = "Section" },
+    Content = new Label { Text = "Content" },
+    Command = new Command(() => Console.WriteLine("Toggled")),
+    CommandParameter = "my-parameter"
+};
+```
+
+## Properties
+
+<ParamField path="body.Header" type="IView" required>
+  The view displayed as the tappable header. A `TapGestureRecognizer` is automatically attached to this view.
+</ParamField>
+
+<ParamField path="body.Content" type="IView" required>
+  The view shown or hidden when the expander is toggled. Its `IsVisible` property is bound to `IsExpanded`.
+</ParamField>
+
+<ParamField path="body.IsExpanded" type="bool" default="false">
+  Whether the expander is currently open. Set this programmatically to open or close the expander without user interaction.
+</ParamField>
+
+<ParamField path="body.Direction" type="ExpandDirection" default="Down">
+  The direction in which content expands. `Down` places the header above the content; `Up` places the content above the header.
+</ParamField>
+
+<ParamField path="body.Command" type="ICommand">
+  A command executed each time the expander is toggled (both when expanding and collapsing).
+</ParamField>
+
+<ParamField path="body.CommandParameter" type="object">
+  The parameter passed to `Command` when it is executed.
+</ParamField>
+
+<ParamField path="body.HandleHeaderTapped" type="Action<TappedEventArgs>">
+  An action invoked when the header is tapped. By default this handles resizing within `CollectionView` and `ListView`. Override with caution, as doing so may break those layouts.
+</ParamField>
+
+## Events
+
+| Event             | Args type                  | Description                                              |
+|-------------------|----------------------------|----------------------------------------------------------|
+| `ExpandedChanged` | `ExpandedChangedEventArgs` | Fired when `IsExpanded` changes. Contains `IsExpanded`. |
+
+## ExpandDirection enum
+
+| Value  | Description                                         |
+|--------|-----------------------------------------------------|
+| `Down` | The header is above the content. Content expands downward. |
+| `Up`   | The content is above the header. Content expands upward.   |
+
+## Platform support
+
+| Platform | Supported |
+|----------|-----------|
+| Android  | Yes       |
+| iOS      | Yes       |
+| macOS    | Yes       |
+| Windows  | Yes       |
+
+<Warning>
+  Overriding `HandleHeaderTapped` may cause `Expander` to work incorrectly when placed inside a `CollectionView` or `ListView`, because the default action is responsible for triggering cell resize updates on those platforms.
+</Warning>

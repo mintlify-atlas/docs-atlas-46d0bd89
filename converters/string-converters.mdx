@@ -1,0 +1,149 @@
+---
+title: "String Converters"
+description: "Converters for null/empty string checks, list-to-string, text case, and more."
+---
+
+## IsStringNullOrEmptyConverter
+
+Returns `true` when the string value is `null` or empty (`""`).
+
+```xml
+<ContentPage.Resources>
+  <toolkit:IsStringNullOrEmptyConverter x:Key="IsNullOrEmpty" />
+</ContentPage.Resources>
+
+<Label IsVisible="{Binding UserName, Converter={StaticResource IsNullOrEmpty}}" Text="Name is required" />
+```
+
+---
+
+## IsStringNotNullOrEmptyConverter
+
+Returns `true` when the string value is not `null` and not empty.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:IsStringNotNullOrEmptyConverter x:Key="IsNotNullOrEmpty" />
+</ContentPage.Resources>
+
+<Button IsEnabled="{Binding SearchQuery, Converter={StaticResource IsNotNullOrEmpty}}" Text="Search" />
+```
+
+---
+
+## IsStringNullOrWhiteSpaceConverter
+
+Returns `true` when the string value is `null`, empty, or contains only whitespace.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:IsStringNullOrWhiteSpaceConverter x:Key="IsNullOrWhiteSpace" />
+</ContentPage.Resources>
+
+<Label IsVisible="{Binding Description, Converter={StaticResource IsNullOrWhiteSpace}}" Text="No description" />
+```
+
+---
+
+## IsStringNotNullOrWhiteSpaceConverter
+
+Returns `true` when the string value contains at least one non-whitespace character.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:IsStringNotNullOrWhiteSpaceConverter x:Key="IsNotNullOrWhiteSpace" />
+</ContentPage.Resources>
+
+<Button IsEnabled="{Binding Message, Converter={StaticResource IsNotNullOrWhiteSpace}}" Text="Send" />
+```
+
+---
+
+## ListToStringConverter
+
+Joins the items of an `IEnumerable` into a single string using a separator.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:ListToStringConverter x:Key="ListToString" Separator=", " />
+</ContentPage.Resources>
+
+<Label Text="{Binding Tags, Converter={StaticResource ListToString}}" />
+```
+
+<ParamField path="Separator" type="string">
+  The string inserted between each item. Default: `", "`.
+</ParamField>
+
+---
+
+## StringToListConverter
+
+Splits a string into a `List<string>` using a separator.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:StringToListConverter x:Key="StringToList" Separator="," />
+</ContentPage.Resources>
+
+<CollectionView ItemsSource="{Binding CsvData, Converter={StaticResource StringToList}}" />
+```
+
+<ParamField path="Separator" type="string">
+  The separator string to split on.
+</ParamField>
+
+<ParamField path="SplitOptions" type="StringSplitOptions">
+  Split options such as `RemoveEmptyEntries`. Default: `StringSplitOptions.None`.
+</ParamField>
+
+---
+
+## TextCaseConverter
+
+Converts a string to upper case, lower case, or title case.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:TextCaseConverter x:Key="ToUpper" Type="Upper" />
+</ContentPage.Resources>
+
+<Label Text="{Binding Title, Converter={StaticResource ToUpper}}" />
+```
+
+<ParamField path="Type" type="TextCaseType">
+  The target case: `Upper`, `Lower`, `FirstUpperRestLower`.
+</ParamField>
+
+---
+
+## ItemTappedEventArgsConverter
+
+Extracts the tapped item from a `ListView` `ItemTappedEventArgs`. Use with `EventToCommandBehavior`.
+
+```xml
+<ListView ItemsSource="{Binding Items}">
+  <ListView.Behaviors>
+    <toolkit:EventToCommandBehavior
+      EventName="ItemTapped"
+      Command="{Binding ItemSelectedCommand}"
+      EventArgsConverter="{StaticResource ItemTappedConverter}" />
+  </ListView.Behaviors>
+</ListView>
+
+<ContentPage.Resources>
+  <toolkit:ItemTappedEventArgsConverter x:Key="ItemTappedConverter" />
+</ContentPage.Resources>
+```
+
+---
+
+## SelectedItemEventArgsConverter
+
+Extracts the selected item from a `ListView` `SelectedItemChangedEventArgs`.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:SelectedItemEventArgsConverter x:Key="SelectedItemConverter" />
+</ContentPage.Resources>
+```

@@ -1,23 +1,11 @@
 {
-  "$schema": "https://mintlify.com/docs.json",
-  "name": ".NET MAUI Community Toolkit",
+  "projectType": "sdk-library",
+  "projectName": ".NET MAUI Community Toolkit",
+  "projectDescription": "A community-maintained collection of reusable controls, behaviors, converters, animations, and essentials for .NET MAUI developers targeting iOS, Android, macOS, Windows, and Tizen.",
   "theme": "palm",
-  "colors": {
-    "primary": "#04a4ec",
-    "light": "#bcbc04"
-  },
-  "favicon": "https://media.brand.dev/1cc7d407-f23a-4b9b-b989-9f91593a9123.png",
-  "navbar": {
-    "primary": {
-      "type": "github",
-      "href": "https://github.com/CommunityToolkit/Maui"
-    }
-  },
-  "footer": {
-    "socials": {
-      "github": "https://github.com/CommunityToolkit/Maui"
-    }
-  },
+  "primaryColor": "#04a4ec",
+  "lightColor": "#bcbc04",
+  "darkColor": null,
   "navigation": {
     "tabs": [
       {
@@ -103,5 +91,64 @@
         ]
       }
     ]
-  }
+  },
+  "keyFeatures": [
+    "Popup control with async result support",
+    "MediaElement for cross-platform audio/video playback",
+    "CameraView for live camera capture",
+    "DrawingView for free-hand drawing",
+    "30+ value converters for XAML data binding",
+    "Touch, Icon tint, StatusBar, and other platform behaviors",
+    "Validation behaviors (email, URL, numeric, text)",
+    "SpeechToText with online and offline support",
+    "FileSaver and FolderPicker essentials",
+    "DockLayout, UniformItemsLayout, and StateContainer layouts",
+    "AvatarView, Expander, RatingView, and more UI controls",
+    "Snackbar and Toast alert notifications",
+    "EventToCommandBehavior for MVVM patterns",
+    "GravatarImageSource image source"
+  ],
+  "publicApiSurface": [
+    "UseMauiCommunityToolkit(MauiAppBuilder)",
+    "UseMauiCommunityToolkitMediaElement(MauiAppBuilder)",
+    "UseMauiCommunityToolkitCamera(MauiAppBuilder)",
+    "UseMauiCommunityToolkitMaps(MauiAppBuilder)",
+    "Popup",
+    "PopupService / IPopupService",
+    "MediaElement",
+    "CameraView",
+    "DrawingView",
+    "AvatarView",
+    "Expander",
+    "RatingView",
+    "SemanticOrderView",
+    "LazyView",
+    "SnackbarExtensions.DisplaySnackbar()",
+    "ToastExtensions.DisplayToast()",
+    "SpeechToText / OfflineSpeechToText",
+    "FileSaver / IFileSaver",
+    "FolderPicker / IFolderPicker",
+    "EventToCommandBehavior",
+    "TouchBehavior",
+    "AnimationBehavior",
+    "MaskedBehavior",
+    "UserStoppedTypingBehavior",
+    "StatusBarBehavior",
+    "IconTintColorBehavior",
+    "ValidationBehavior (Email, Uri, Numeric, Text, Characters)",
+    "BoolToObjectConverter",
+    "InvertedBoolConverter",
+    "ColorToRgbStringConverter",
+    "MathExpressionConverter",
+    "MultiConverter",
+    "ListToStringConverter",
+    "EnumToBoolConverter",
+    "DockLayout",
+    "UniformItemsLayout",
+    "StateContainer / StateContainerController",
+    "GravatarImageSource",
+    "ColorAnimationExtensions",
+    "SafeFireAndForgetExtensions",
+    "AppTheme<T>"
+  ]
 }

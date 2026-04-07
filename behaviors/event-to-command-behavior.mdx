@@ -1,0 +1,133 @@
+---
+title: "EventToCommandBehavior & Related Behaviors"
+description: "Bind control events to ICommand, mask input, react to typing, and more."
+---
+
+## EventToCommandBehavior
+
+`EventToCommandBehavior` allows you to invoke an `ICommand` in response to any event exposed by a control — ideal for MVVM patterns where code-behind is undesirable.
+
+```xml
+<ListView ItemsSource="{Binding Items}">
+  <ListView.Behaviors>
+    <toolkit:EventToCommandBehavior
+      EventName="ItemTapped"
+      Command="{Binding ItemTappedCommand}"
+      EventArgsConverter="{StaticResource ItemTappedConverter}" />
+  </ListView.Behaviors>
+</ListView>
+```
+
+### Properties
+
+<ParamField path="EventName" type="string?">
+  The name of the event on the attached control to listen to (e.g. `"Clicked"`, `"ItemTapped"`).
+</ParamField>
+
+<ParamField path="Command" type="ICommand?">
+  The command to execute when the event fires.
+</ParamField>
+
+<ParamField path="CommandParameter" type="object?">
+  An optional parameter to pass to the command. Takes precedence over `EventArgsConverter`.
+</ParamField>
+
+<ParamField path="EventArgsConverter" type="IValueConverter?">
+  Converts the `EventArgs` of the event to a value passed as the command parameter.
+</ParamField>
+
+---
+
+## MaskedBehavior
+
+`MaskedBehavior` applies an input mask to an `Entry`, allowing only specific character patterns.
+
+```xml
+<Entry Placeholder="Phone number">
+  <Entry.Behaviors>
+    <toolkit:MaskedBehavior Mask="+1 (XXX) XXX-XXXX" />
+  </Entry.Behaviors>
+</Entry>
+```
+
+<ParamField path="Mask" type="string?">
+  The mask pattern. Characters matching `UnmaskedCharacter` are user-editable slots; all other characters are treated as fixed separators displayed automatically.
+</ParamField>
+
+<ParamField path="UnmaskedCharacter" type="char">
+  The character in the mask that represents a user-editable position. Default: `'X'`. Change this if you need to include literal `X` characters in the mask.
+</ParamField>
+
+---
+
+## MaxLengthReachedBehavior
+
+Fires a command when the text in an `Entry` reaches its `MaxLength`.
+
+```xml
+<Entry MaxLength="6" Placeholder="Enter OTP">
+  <Entry.Behaviors>
+    <toolkit:MaxLengthReachedBehavior
+      Command="{Binding OtpEnteredCommand}"
+      ShouldDismissKeyboardAutomatically="True" />
+  </Entry.Behaviors>
+</Entry>
+```
+
+<ParamField path="Command" type="ICommand?">
+  Executed when `MaxLength` is reached. The current text is passed as the command parameter.
+</ParamField>
+
+<ParamField path="ShouldDismissKeyboardAutomatically" type="bool">
+  If `true`, the keyboard is dismissed when max length is reached. Default: `false`.
+</ParamField>
+
+---
+
+## UserStoppedTypingBehavior
+
+Executes a command after the user stops typing for a configurable duration — useful for search-as-you-type scenarios.
+
+```xml
+<Entry Placeholder="Search...">
+  <Entry.Behaviors>
+    <toolkit:UserStoppedTypingBehavior
+      StoppedTypingTimeThreshold="500"
+      MinimumLengthThreshold="3"
+      ShouldDismissKeyboardAutomatically="False"
+      Command="{Binding SearchCommand}" />
+  </Entry.Behaviors>
+</Entry>
+```
+
+<ParamField path="Command" type="ICommand?">
+  The command to execute after the user stops typing. The current text is passed as the parameter.
+</ParamField>
+
+<ParamField path="StoppedTypingTimeThreshold" type="int">
+  Milliseconds to wait after the last keystroke before firing the command. Default: `1000`.
+</ParamField>
+
+<ParamField path="MinimumLengthThreshold" type="int">
+  Minimum number of characters required before the command fires. Default: `0`.
+</ParamField>
+
+<ParamField path="ShouldDismissKeyboardAutomatically" type="bool">
+  If `true`, the keyboard is dismissed when the command fires. Default: `false`.
+</ParamField>
+
+---
+
+## SetFocusOnEntryCompletedBehavior
+
+Automatically moves focus to a target `VisualElement` when the user completes the current `Entry` (presses return/next). Uses an attached property pattern.
+
+```xml
+<Entry x:Name="FirstEntry" Placeholder="First name"
+       toolkit:SetFocusOnEntryCompletedBehavior.NextElement="{x:Reference LastNameEntry}" />
+<Entry x:Name="LastNameEntry" Placeholder="Last name" />
+```
+
+<ParamField path="SetFocusOnEntryCompletedBehavior.NextElement" type="VisualElement?">
+  Attached property. The element to focus when the entry is completed. Set directly on the `Entry` element (not inside a `Behaviors` collection).
+</ParamField>

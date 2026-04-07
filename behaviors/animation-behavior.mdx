@@ -1,0 +1,136 @@
+---
+title: "AnimationBehavior"
+description: "Trigger animations on any VisualElement in response to events, tap gestures, or commands."
+---
+
+`AnimationBehavior` is a behavior that runs a `BaseAnimation` on a `VisualElement` when a configured event fires, when the element is tapped, or when an `ICommand` is invoked via data binding.
+
+## Basic usage
+
+<Steps>
+  <Step title="Add the XAML namespace">
+    ```xml
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    ```
+  </Step>
+  <Step title="Attach the behavior and set an animation type">
+    ```xml
+    <Image Source="icon.png">
+      <Image.Behaviors>
+        <toolkit:AnimationBehavior AnimateOnTap="True">
+          <toolkit:AnimationBehavior.AnimationType>
+            <toolkit:FadeAnimation />
+          </toolkit:AnimationBehavior.AnimationType>
+        </toolkit:AnimationBehavior>
+      </Image.Behaviors>
+    </Image>
+    ```
+  </Step>
+</Steps>
+
+## Trigger via command (MVVM)
+
+Bind `AnimateCommand` back to your ViewModel using `OneWayToSource`:
+
+```xml
+<Image Source="icon.png">
+  <Image.Behaviors>
+    <toolkit:AnimationBehavior
+      AnimateCommand="{Binding TriggerAnimationCommand, Mode=OneWayToSource}">
+      <toolkit:AnimationBehavior.AnimationType>
+        <toolkit:FadeAnimation />
+      </toolkit:AnimationBehavior.AnimationType>
+    </toolkit:AnimationBehavior>
+  </Image.Behaviors>
+</Image>
+```
+
+```csharp ViewModel.cs
+public Command<CancellationToken>? TriggerAnimationCommand { get; set; }
+
+// Invoke from code:
+await TriggerAnimationCommand?.ExecuteAsync(CancellationToken.None);
+```
+
+## Trigger via event
+
+```xml
+<Button Text="Click me">
+  <Button.Behaviors>
+    <toolkit:AnimationBehavior EventName="Clicked">
+      <toolkit:AnimationBehavior.AnimationType>
+        <toolkit:FadeAnimation />
+      </toolkit:AnimationBehavior.AnimationType>
+    </toolkit:AnimationBehavior>
+  </Button.Behaviors>
+</Button>
+```
+
+## Properties
+
+<ParamField path="AnimationType" type="BaseAnimation?">
+  The animation to run. Use `FadeAnimation` or create a custom animation by subclassing `BaseAnimation`.
+</ParamField>
+
+<ParamField path="AnimateOnTap" type="bool">
+  When `true`, a `TapGestureRecognizer` is automatically added and the animation runs on each tap. Default: `false`.
+</ParamField>
+
+<ParamField path="AnimateCommand" type="Command&lt;CancellationToken&gt;">
+  A one-way-to-source bindable command. Bind this to a property on your ViewModel to trigger the animation programmatically. Do not set this directly.
+</ParamField>
+
+<ParamField path="EventName" type="string?">
+  Inherited from `EventToCommandBehavior`. The name of the event on the attached control that triggers the animation.
+</ParamField>
+
+## ProgressBarAnimationBehavior
+
+`ProgressBarAnimationBehavior` animates a `ProgressBar` to a target progress value.
+
+```xml
+<ProgressBar x:Name="MyProgressBar">
+  <ProgressBar.Behaviors>
+    <toolkit:ProgressBarAnimationBehavior
+      ProgressTo="0.75"
+      Length="500"
+      Easing="{x:Static Easing.CubicInOut}" />
+  </ProgressBar.Behaviors>
+</ProgressBar>
+```
+
+<ParamField path="ProgressTo" type="double">
+  The target progress value between 0 and 1.
+</ParamField>
+
+<ParamField path="Length" type="uint">
+  Duration of the animation in milliseconds.
+</ParamField>
+
+<ParamField path="Easing" type="Easing">
+  The easing function to apply during the animation.
+</ParamField>
+
+## FadeAnimation
+
+`FadeAnimation` is the built-in animation type. It fades the element's opacity.
+
+```xml
+<toolkit:FadeAnimation Opacity="0.3" Duration="400" Easing="{x:Static Easing.Linear}" />
+```
+
+<ParamField path="Opacity" type="double">
+  The target opacity value. Default: `0.3`.
+</ParamField>
+
+<ParamField path="Duration" type="uint">
+  Duration in milliseconds. Default: `250`.
+</ParamField>
+
+<ParamField path="Easing" type="Easing">
+  The easing function. Default: `Easing.Linear`.
+</ParamField>
+
+<Note>
+  To suppress exceptions thrown during animations (for example, if the view is detached), set `Options.ShouldSuppressExceptionsInAnimations = true` in your `UseMauiCommunityToolkit()` options.
+</Note>

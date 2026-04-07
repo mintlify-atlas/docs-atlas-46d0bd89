@@ -1,0 +1,77 @@
+---
+title: "Introduction"
+description: "A community-maintained library of reusable controls, behaviors, converters, layouts, animations, and essentials for .NET MAUI."
+---
+
+The .NET MAUI Community Toolkit is a collection of common elements for development with .NET MAUI that developers tend to replicate across multiple apps. It simplifies and demonstrates common developer tasks when building cross-platform apps with .NET MAUI.
+
+All features are contributed by the .NET community and maintained by a core set of maintainers. Features added to the toolkit may one day be promoted into the official .NET MAUI library.
+
+## Available packages
+
+The toolkit is distributed as four separate NuGet packages. Install only what your app needs.
+
+<CardGroup cols={2}>
+  <Card title="CommunityToolkit.Maui" icon="box" href="/get-started">
+    The core package. Includes controls, behaviors, converters, layouts, animations, essentials, and extensions. Required for all toolkit features.
+  </Card>
+  <Card title="CommunityToolkit.Maui.MediaElement" icon="film" href="/controls/mediaelement">
+    Cross-platform audio and video playback. Add a `MediaElement` control to play local or remote media on iOS, Android, macOS, Windows, and Tizen.
+  </Card>
+  <Card title="CommunityToolkit.Maui.Camera" icon="camera" href="/controls/cameraview">
+    Live camera preview and capture via `CameraView`. Supports photo and video recording on iOS, Android, macOS, and Windows. Tizen is not supported.
+  </Card>
+  <Card title="CommunityToolkit.Maui.Maps" icon="map" href="/controls/maps">
+    An enhanced map control built on top of .NET MAUI Maps. Provides a Bing Maps-backed `MapHandler` for Windows using your own API key.
+  </Card>
+</CardGroup>
+
+## Platform support
+
+The core package and most optional packages require the following minimum OS versions:
+
+| Platform       | Minimum version              |
+| -------------- | ---------------------------- |
+| iOS            | 15.0                         |
+| macOS Catalyst | 15.0                         |
+| Android        | 21.0 (Android 5.0 Lollipop) |
+| Windows        | 10.0.17763 (October 2018 Update) |
+| Tizen          | 6.5                          |
+
+<Note>
+  `CommunityToolkit.Maui.Camera` is not supported on Tizen. `CommunityToolkit.Maui.MediaElement` requires Android 26.0 (Android 8.0 Oreo) or higher on Android.
+</Note>
+
+## Feature categories
+
+<CardGroup cols={2}>
+  <Card title="Controls" icon="window" href="/controls/popup">
+    UI controls including `Popup`, `DrawingView`, `AvatarView`, `Expander`, `LazyView`, `RatingView`, and `SemanticOrderView`. The optional packages add `MediaElement`, `CameraView`, and enhanced Maps.
+  </Card>
+  <Card title="Behaviors" icon="bolt" href="/behaviors/overview">
+    Reusable behaviors including `AnimationBehavior`, `EventToCommandBehavior`, `MaskedBehavior`, `MaxLengthReachedBehavior`, `UserStoppedTypingBehavior`, validation behaviors, and platform-specific behaviors.
+  </Card>
+  <Card title="Converters" icon="arrows-left-right" href="/converters/overview">
+    30+ value converters for XAML data binding. Covers bool, string, color, enum, numeric, collection, and date/time conversions. All converters implement `ICommunityToolkitValueConverter`.
+  </Card>
+  <Card title="Layouts" icon="table-cells" href="/layouts/dock-layout">
+    Custom layouts including `DockLayout`, `UniformItemsLayout`, and `StateContainer` for managing view states.
+  </Card>
+  <Card title="Essentials" icon="sparkles" href="/essentials/app-theme">
+    App theming utilities including `AppTheme`, `AppThemeObjectExtensions`, and `AppThemeResourceExtension` for responding to light and dark mode changes.
+  </Card>
+  <Card title="Extensions & animations" icon="wand-magic-sparkles" href="/extensions/overview">
+    Extension methods including `ColorAnimationExtensions`, `PopupExtensions`, and `ServiceCollectionExtensions`. Animation helpers include `FadeAnimation`. Image sources include `GravatarImageSource` for Gravatar profile images.
+  </Card>
+</CardGroup>
+
+## How to get started
+
+<CardGroup cols={2}>
+  <Card title="Get started" icon="rocket" href="/get-started">
+    Install the NuGet packages, initialize the toolkit in `MauiProgram.cs`, and add the XAML namespace.
+  </Card>
+  <Card title="Upgrade guide" icon="arrow-up-circle" href="/upgrade-guide">
+    Upgrading from an earlier version? Check minimum platform requirements and re-verify your initialization code.
+  </Card>
+</CardGroup>

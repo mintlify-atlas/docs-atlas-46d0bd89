@@ -1,0 +1,76 @@
+---
+title: "AppTheme"
+description: "Define theme-aware values for light and dark mode using AppThemeObject and AppThemeColor."
+---
+
+The toolkit's AppTheme helpers let you define different values for light and dark OS themes without writing manual theme-switching code.
+
+## AppThemeColor
+
+`AppThemeColor` provides theme-aware `Color` values:
+
+```xml
+<ContentPage.Resources>
+  <toolkit:AppThemeColor
+    x:Key="PageBackground"
+    Light="White"
+    Dark="#1A1A2E"
+    Default="White" />
+</ContentPage.Resources>
+
+<ContentPage BackgroundColor="{DynamicResource PageBackground}" />
+```
+
+<ParamField path="Light" type="Color?">
+  The color used when the OS is in light mode.
+</ParamField>
+
+<ParamField path="Dark" type="Color?">
+  The color used when the OS is in dark mode.
+</ParamField>
+
+<ParamField path="Default" type="Color?">
+  The fallback color when the theme is unspecified or when `Light`/`Dark` is not set.
+</ParamField>
+
+## AppThemeObject
+
+`AppThemeObject` provides theme-aware values for any object type (strings, images, font sizes, etc.):
+
+```xml
+<ContentPage.Resources>
+  <toolkit:AppThemeObject
+    x:Key="LogoImage"
+    Light="logo_light.png"
+    Dark="logo_dark.png" />
+</ContentPage.Resources>
+
+<Image Source="{Binding Source={StaticResource LogoImage}, Path=Light}" />
+```
+
+### Using GetBinding() in C#
+
+```csharp
+var themeObject = new AppThemeObject<string>
+{
+    Light = "logo_light.png",
+    Dark = "logo_dark.png",
+    Default = "logo_light.png"
+};
+
+myImage.SetBinding(Image.SourceProperty, themeObject.GetBinding());
+```
+
+## AppThemeResourceExtension (XAML markup extension)
+
+Use `AppThemeResource` as a XAML markup extension for inline theme bindings:
+
+```xml
+<Label
+  TextColor="{toolkit:AppThemeResource Light=Black, Dark=White}"
+  Text="Hello, theme!" />
+```
+
+<Tip>
+  `AppThemeColor` and `AppThemeObject` work best as static resources referenced with `DynamicResource`. Use `DynamicResource` (not `StaticResource`) so the binding updates automatically when the user switches themes.
+</Tip>

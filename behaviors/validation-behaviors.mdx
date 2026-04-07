@@ -1,0 +1,230 @@
+---
+title: "Validation Behaviors"
+description: "Validate user input with built-in email, URL, numeric, text, and custom validation behaviors."
+---
+
+The validation behaviors all inherit from `ValidationBehavior` and share a common set of properties for controlling when and how validation occurs, and what visual feedback to show.
+
+## Common properties
+
+<ParamField path="IsValid" type="bool">
+  Read-only (OneWayToSource). Indicates whether the current value is valid. Bind to your ViewModel to track validity.
+</ParamField>
+
+<ParamField path="IsRunning" type="bool">
+  Read-only. `true` while an async validation is in progress.
+</ParamField>
+
+<ParamField path="ValidStyle" type="Style?">
+  A `Style` applied to the control when the value is valid.
+</ParamField>
+
+<ParamField path="InvalidStyle" type="Style?">
+  A `Style` applied to the control when the value is invalid.
+</ParamField>
+
+<ParamField path="Flags" type="ValidationFlags">
+  Controls when validation runs. Flags: `ValidateOnAttaching`, `ValidateOnFocused`, `ValidateOnUnfocused`, `ValidateOnValueChanged`, `ForceMakeValidWhenFocused`.
+</ParamField>
+
+<ParamField path="ForceValidateCommand" type="ICommand">
+  OneWayToSource command. Bind to your ViewModel to trigger validation programmatically.
+</ParamField>
+
+```xml
+<!-- Define valid/invalid styles in resources -->
+<Style x:Key="ValidEntryStyle" TargetType="Entry">
+  <Setter Property="TextColor" Value="Green" />
+</Style>
+<Style x:Key="InvalidEntryStyle" TargetType="Entry">
+  <Setter Property="TextColor" Value="Red" />
+</Style>
+```
+
+---
+
+## EmailValidationBehavior
+
+Validates that the text is a properly-formatted email address.
+
+```xml
+<Entry Placeholder="Email address">
+  <Entry.Behaviors>
+    <toolkit:EmailValidationBehavior
+      InvalidStyle="{StaticResource InvalidEntryStyle}"
+      ValidStyle="{StaticResource ValidEntryStyle}"
+      Flags="ValidateOnValueChanged" />
+  </Entry.Behaviors>
+</Entry>
+```
+
+---
+
+## UriValidationBehavior
+
+Validates that the text is a valid URI.
+
+```xml
+<Entry Placeholder="https://example.com">
+  <Entry.Behaviors>
+    <toolkit:UriValidationBehavior
+      UriKind="Absolute"
+      InvalidStyle="{StaticResource InvalidEntryStyle}"
+      Flags="ValidateOnValueChanged" />
+  </Entry.Behaviors>
+</Entry>
+```
+
+<ParamField path="UriKind" type="UriKind">
+  The kind of URI to accept: `Absolute`, `Relative`, or `RelativeOrAbsolute`. Default: `RelativeOrAbsolute`.
+</ParamField>
+
+---
+
+## NumericValidationBehavior
+
+Validates that the text is a number within an optional range.
+
+```xml
+<Entry Placeholder="Age (1-120)" Keyboard="Numeric">
+  <Entry.Behaviors>
+    <toolkit:NumericValidationBehavior
+      MinimumValue="1"
+      MaximumValue="120"
+      MaximumDecimalPlaces="0"
+      InvalidStyle="{StaticResource InvalidEntryStyle}"
+      Flags="ValidateOnValueChanged" />
+  </Entry.Behaviors>
+</Entry>
+```
+
+<ParamField path="MinimumValue" type="double">
+  Minimum allowed value. Default: `double.NegativeInfinity`.
+</ParamField>
+
+<ParamField path="MaximumValue" type="double">
+  Maximum allowed value. Default: `double.PositiveInfinity`.
+</ParamField>
+
+<ParamField path="MinimumDecimalPlaces" type="int">
+  Minimum number of decimal places required.
+</ParamField>
+
+<ParamField path="MaximumDecimalPlaces" type="int">
+  Maximum number of decimal places allowed. Default: `int.MaxValue`.
+</ParamField>
+
+---
+
+## TextValidationBehavior
+
+Validates text against length constraints and optional regex patterns.
+
+```xml
+<Entry Placeholder="Username (3-20 chars)">
+  <Entry.Behaviors>
+    <toolkit:TextValidationBehavior
+      MinimumLength="3"
+      MaximumLength="20"
+      RegexPattern="^[a-zA-Z0-9_]+$"
+      InvalidStyle="{StaticResource InvalidEntryStyle}"
+      Flags="ValidateOnValueChanged" />
+  </Entry.Behaviors>
+</Entry>
+```
+
+<ParamField path="MinimumLength" type="int">
+  Minimum character count. Default: `0`.
+</ParamField>
+
+<ParamField path="MaximumLength" type="int">
+  Maximum character count. Default: `int.MaxValue`.
+</ParamField>
+
+<ParamField path="RegexPattern" type="string?">
+  A regex pattern the text must match to be valid.
+</ParamField>
+
+<ParamField path="RegexOptions" type="RegexOptions">
+  Options for the regex pattern. Default: `RegexOptions.None`.
+</ParamField>
+
+---
+
+## CharactersValidationBehavior
+
+Validates that the text contains required character types.
+
+```xml
+<Entry Placeholder="Password">
+  <Entry.Behaviors>
+    <toolkit:CharactersValidationBehavior
+      CharacterType="LowercaseLetter, UppercaseLetter, Digit"
+      MinimumCharacterTypeCount="1"
+      MinimumLength="8"
+      InvalidStyle="{StaticResource InvalidEntryStyle}"
+      Flags="ValidateOnValueChanged" />
+  </Entry.Behaviors>
+</Entry>
+```
+
+<ParamField path="CharacterType" type="CharacterType">
+  Required character categories. Flags: `LowercaseLetter`, `UppercaseLetter`, `Digit`, `Whitespace`, `NonAlphanumericSymbol`, `LowercaseLatinLetter`, `UppercaseLatinLetter`, `LatinLetter`, `Letter`, `Any`.
+</ParamField>
+
+<ParamField path="MinimumCharacterTypeCount" type="int">
+  Minimum number of characters matching `CharacterType`. Default: `0`.
+</ParamField>
+
+---
+
+## MultiValidationBehavior
+
+Combines multiple validation behaviors using AND logic, and collects error messages.
+
+```xml
+<Entry Placeholder="Password">
+  <Entry.Behaviors>
+    <toolkit:MultiValidationBehavior
+      InvalidStyle="{StaticResource InvalidEntryStyle}"
+      Flags="ValidateOnValueChanged">
+      <toolkit:CharactersValidationBehavior
+        CharacterType="UppercaseLetter"
+        MinimumCharacterTypeCount="1"
+        toolkit:MultiValidationBehavior.Error="Needs uppercase" />
+      <toolkit:CharactersValidationBehavior
+        CharacterType="Digit"
+        MinimumCharacterTypeCount="1"
+        toolkit:MultiValidationBehavior.Error="Needs a digit" />
+      <toolkit:TextValidationBehavior
+        MinimumLength="8"
+        toolkit:MultiValidationBehavior.Error="Must be 8+ chars" />
+    </toolkit:MultiValidationBehavior>
+  </Entry.Behaviors>
+</Entry>
+```
+
+<ParamField path="Errors" type="IList?">
+  OneWayToSource. The list of `Error` messages from failing child validators.
+</ParamField>
+
+---
+
+## RequiredStringValidationBehavior
+
+Validates that the text matches a required value exactly.
+
+```xml
+<Entry Placeholder="Type CONFIRM to proceed">
+  <Entry.Behaviors>
+    <toolkit:RequiredStringValidationBehavior
+      RequiredString="CONFIRM"
+      InvalidStyle="{StaticResource InvalidEntryStyle}"
+      Flags="ValidateOnValueChanged" />
+  </Entry.Behaviors>
+</Entry>
+```
+
+<ParamField path="RequiredString" type="string?">
+  The exact string that the value must match to be considered valid.
+</ParamField>

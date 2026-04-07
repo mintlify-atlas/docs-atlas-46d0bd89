@@ -1,0 +1,130 @@
+---
+title: "Color Converters"
+description: "Convert Color values to strings, hex, grayscale, and extract individual components."
+---
+
+## ColorToRgbStringConverter
+
+Converts a `Color` to an RGB string in the format `"rgb(R,G,B)"`.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:ColorToRgbStringConverter x:Key="ColorToRgb" />
+</ContentPage.Resources>
+
+<Label Text="{Binding SelectedColor, Converter={StaticResource ColorToRgb}}" />
+```
+
+---
+
+## ColorToRgbaStringConverter
+
+Converts a `Color` to an RGBA string in the format `"rgba(R,G,B,A)"`.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:ColorToRgbaStringConverter x:Key="ColorToRgba" />
+</ContentPage.Resources>
+
+<Label Text="{Binding SelectedColor, Converter={StaticResource ColorToRgba}}" />
+```
+
+---
+
+## ColorToHexRgbConverter
+
+Converts a `Color` to a hex string in the format `"#RRGGBB"`.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:ColorToHexRgbConverter x:Key="ColorToHex" />
+</ContentPage.Resources>
+
+<Label Text="{Binding SelectedColor, Converter={StaticResource ColorToHex}}" />
+```
+
+---
+
+## ColorToHexRgbaConverter
+
+Converts a `Color` to a hex string in the format `"#RRGGBBAA"`.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:ColorToHexRgbaConverter x:Key="ColorToHexRgba" />
+</ContentPage.Resources>
+```
+
+---
+
+## ColorToGrayScaleColorConverter
+
+Converts a `Color` to its grayscale equivalent by averaging the RGB channels.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:ColorToGrayScaleColorConverter x:Key="ToGrayScale" />
+</ContentPage.Resources>
+
+<BoxView Color="{Binding ThemeColor, Converter={StaticResource ToGrayScale}}" />
+```
+
+---
+
+## ColorToInverseColorConverter
+
+Returns the inverse of a `Color` (each channel is subtracted from 1).
+
+```xml
+<ContentPage.Resources>
+  <toolkit:ColorToInverseColorConverter x:Key="InvertColor" />
+</ContentPage.Resources>
+
+<BoxView Color="{Binding BackgroundColor, Converter={StaticResource InvertColor}}" />
+```
+
+---
+
+## ColorToComponentConverter
+
+Extracts a single numeric component (R, G, B, A, Hue, Saturation, Luminosity) from a `Color`.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:ColorToComponentConverter x:Key="RedChannel" Component="Red" />
+</ContentPage.Resources>
+
+<Slider Value="{Binding ThemeColor, Converter={StaticResource RedChannel}}" />
+```
+
+<ParamField path="Component" type="ColorComponent">
+  The component to extract: `Red`, `Green`, `Blue`, `Alpha`, `Hue`, `Saturation`, `Luminosity`.
+</ParamField>
+
+---
+
+## ByteArrayToImageSourceConverter
+
+Converts a `byte[]` to a `StreamImageSource` for displaying images from byte data.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:ByteArrayToImageSourceConverter x:Key="ByteToImage" />
+</ContentPage.Resources>
+
+<Image Source="{Binding AvatarBytes, Converter={StaticResource ByteToImage}}" />
+```
+
+---
+
+## ImageResourceConverter
+
+Converts a resource name string to an `ImageSource`.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:ImageResourceConverter x:Key="ImageResource" />
+</ContentPage.Resources>
+
+<Image Source="{Binding IconName, Converter={StaticResource ImageResource}}" />
+```

@@ -1,0 +1,157 @@
+---
+title: "Toast & Snackbar"
+description: "Display brief non-blocking notifications to users with Toast and Snackbar."
+---
+
+The toolkit provides two alert types for displaying brief, non-blocking notifications: `Toast` (a simple timed message) and `Snackbar` (a timed message with an optional action button).
+
+Both are in the `CommunityToolkit.Maui.Alerts` namespace.
+
+```csharp
+using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Core;
+```
+
+---
+
+## Toast
+
+`Toast` displays a short text message that disappears automatically after a set duration.
+
+### Basic usage
+
+```csharp
+var toast = Toast.Make("Item saved!", ToastDuration.Short, 14);
+await toast.Show(CancellationToken.None);
+```
+
+### Toast.Make()
+
+```csharp
+IToast Toast.Make(
+    string message,
+    ToastDuration duration = ToastDuration.Short,
+    double textSize = AlertDefaults.FontSize)
+```
+
+<ParamField path="message" type="string" required>
+  The message to display.
+</ParamField>
+
+<ParamField path="duration" type="ToastDuration">
+  How long to show the toast. `Short` ≈ 2 seconds, `Long` ≈ 3.5 seconds. Default: `Short`.
+</ParamField>
+
+<ParamField path="textSize" type="double">
+  Font size for the message. Must be positive. Default: `AlertDefaults.FontSize`.
+</ParamField>
+
+### Methods
+
+| Method | Description |
+|---|---|
+| `Show(CancellationToken)` | Displays the toast. |
+| `Dismiss(CancellationToken)` | Hides the toast before it auto-dismisses. |
+| `Dispose()` | Releases toast resources. |
+
+---
+
+## Snackbar
+
+`Snackbar` displays a message at the bottom of the screen with an optional action button.
+
+### Basic usage
+
+```csharp
+var snackbar = Snackbar.Make("File deleted", () => UndoDelete(), "Undo");
+await snackbar.Show(CancellationToken.None);
+```
+
+### Snackbar.Make()
+
+```csharp
+ISnackbar Snackbar.Make(
+    string message,
+    Action? action = null,
+    string actionButtonText = AlertDefaults.ActionButtonText,
+    TimeSpan? duration = null,
+    SnackbarOptions? visualOptions = null,
+    IView? anchor = null)
+```
+
+<ParamField path="message" type="string" required>
+  The message displayed in the snackbar.
+</ParamField>
+
+<ParamField path="action" type="Action?">
+  Optional. Called when the user taps the action button.
+</ParamField>
+
+<ParamField path="actionButtonText" type="string">
+  Text for the action button. Default: `AlertDefaults.ActionButtonText` (`"OK"`).
+</ParamField>
+
+<ParamField path="duration" type="TimeSpan?">
+  How long the snackbar is shown. Default: 3 seconds.
+</ParamField>
+
+<ParamField path="visualOptions" type="SnackbarOptions?">
+  Optional visual customization (background color, font, corner radius, etc.).
+</ParamField>
+
+<ParamField path="anchor" type="IView?">
+  An optional view to anchor the snackbar above. If `null`, it appears at the bottom of the screen.
+</ParamField>
+
+### Methods
+
+| Method | Description |
+|---|---|
+| `Show(CancellationToken)` | Displays the snackbar. |
+| `Dismiss(CancellationToken)` | Hides the snackbar before it auto-dismisses. |
+
+### Static members
+
+| Member | Description |
+|---|---|
+| `Snackbar.IsShown` | `true` while the snackbar is visible. |
+| `Snackbar.Shown` | Event fired when the snackbar becomes visible. |
+| `Snackbar.Dismissed` | Event fired when the snackbar is dismissed. |
+
+### Anchored snackbar
+
+```csharp
+// Anchor snackbar above a specific button
+var snackbar = Snackbar.Make("Saved!", anchor: myButton);
+await snackbar.Show(CancellationToken.None);
+```
+
+### SnackbarOptions
+
+```csharp
+var options = new SnackbarOptions
+{
+    BackgroundColor = Colors.DarkSlateGray,
+    TextColor = Colors.White,
+    ActionButtonTextColor = Colors.Yellow,
+    CornerRadius = new CornerRadius(10),
+    Font = Font.SystemFontOfSize(14),
+    ActionButtonFont = Font.SystemFontOfSize(14, FontAttributes.Bold)
+};
+
+var snackbar = Snackbar.Make("Custom snackbar", null, "Dismiss", visualOptions: options);
+await snackbar.Show();
+```
+
+## Platform support
+
+| Platform | Toast | Snackbar |
+|---|---|---|
+| Android | Yes | Yes |
+| iOS | Yes | Yes |
+| macOS Catalyst | Yes | Yes |
+| Windows | Yes | Yes (requires extra setup) |
+
+<Warning>
+  On Windows, Snackbar requires calling `options.SetShouldEnableSnackbarOnWindows(true)` inside `UseMauiCommunityToolkit()` and additional `Package.appxmanifest` setup. See the [get-started](/get-started) page for initialization details.
+</Warning>

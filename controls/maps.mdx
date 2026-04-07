@@ -1,0 +1,181 @@
+---
+title: 'Maps'
+description: 'Enhanced map support for .NET MAUI with a Windows-specific handler that uses Bing Maps and extends the built-in Map control.'
+---
+
+`CommunityToolkit.Maui.Maps` provides an extended map handler for Windows that adds Bing Maps support to the standard .NET MAUI `Map` control. On Android, iOS, and macOS, the built-in MAUI map handlers are used unchanged.
+
+<Info>
+  Maps support is distributed in a separate NuGet package: `CommunityToolkit.Maui.Maps`. The standard `Microsoft.Maui.Controls.Maps` package is still required.
+</Info>
+
+## Installation
+
+<Steps>
+  <Step title="Install the NuGet packages">
+    ```bash
+    dotnet add package CommunityToolkit.Maui.Maps
+    dotnet add package Microsoft.Maui.Controls.Maps
+    ```
+  </Step>
+  <Step title="Initialize the toolkit in MauiProgram.cs">
+    On Windows, provide a Bing Maps API key. The toolkit handles wiring up the custom Windows handler automatically.
+
+    ```csharp
+    var builder = MauiApp.CreateBuilder();
+    builder
+        .UseMauiApp<App>()
+        .UseMauiMaps()
+        .UseMauiCommunityToolkitMaps(bingMapsKey: "YOUR_BING_MAPS_KEY");
+    ```
+
+    <Warning>
+      On Windows, a valid Bing Maps API key is required. The app will throw an `InvalidOperationException` at runtime if the key is empty or missing.
+    </Warning>
+  </Step>
+  <Step title="Add the map namespace in XAML">
+    ```xml
+    xmlns:maps="http://schemas.microsoft.com/dotnet/2021/maui/maps"
+    ```
+  </Step>
+</Steps>
+
+## Usage
+
+### XAML
+
+The standard .NET MAUI `Map` control is used directly. The Community Toolkit supplies the Windows-specific handler transparently.
+
+```xml
+<maps:Map
+    x:Name="MyMap"
+    IsShowingUser="{Binding ShowUserLocation}"
+    IsTrafficEnabled="{Binding ShowTraffic}"
+    IsZoomEnabled="True"
+    IsScrollEnabled="True"
+    MapType="Street" />
+```
+
+### XAML — with pins
+
+```xml
+<maps:Map x:Name="MyMap">
+    <maps:Map.Pins>
+        <maps:Pin
+            Label="Eiffel Tower"
+            Address="Champ de Mars, Paris"
+            Location="{maps:Location 48.8584, 2.2945}" />
+    </maps:Map.Pins>
+</maps:Map>
+```
+
+### C# — moving to a region
+
+```csharp
+var paris = new Location(48.8584, 2.2945);
+var region = MapSpan.FromCenterAndRadius(paris, Distance.FromKilometers(5));
+MyMap.MoveToRegion(region);
+```
+
+### C# — adding pins programmatically
+
+```csharp
+var pin = new Pin
+{
+    Label = "Sydney Opera House",
+    Address = "Bennelong Point, Sydney NSW 2000",
+    Location = new Location(-33.8568, 151.2153)
+};
+
+pin.MarkerClicked += (sender, e) =>
+{
+    e.HideInfoWindow = false; // Show the info window
+};
+
+MyMap.Pins.Add(pin);
+```
+
+### C# — changing map type
+
+```csharp
+MyMap.MapType = MapType.Satellite;
+// Other options: MapType.Street, MapType.Hybrid
+```
+
+### C# — toggling features
+
+```csharp
+// Show or hide the user's current location pin
+MyMap.IsShowingUser = true;
+
+// Enable or disable traffic overlay
+MyMap.IsTrafficEnabled = true;
+
+// Lock or unlock zoom and scroll
+MyMap.IsZoomEnabled = false;
+MyMap.IsScrollEnabled = false;
+```
+
+## Map properties
+
+These properties are inherited from the standard .NET MAUI `Map` control and are supported by the Community Toolkit Windows handler:
+
+<ParamField path="body.MapType" type="MapType" default="Street">
+  The type of map tiles to display. Values: `Street`, `Satellite`, `Hybrid`.
+</ParamField>
+
+<ParamField path="body.IsShowingUser" type="bool" default="false">
+  When `true`, the user's current location is shown as a pin on the map. Requires location permission.
+</ParamField>
+
+<ParamField path="body.IsTrafficEnabled" type="bool" default="false">
+  When `true`, a traffic overlay is shown on the map.
+</ParamField>
+
+<ParamField path="body.IsZoomEnabled" type="bool" default="true">
+  Whether the user can zoom the map. When `false`, zoom gestures and controls are disabled.
+</ParamField>
+
+<ParamField path="body.IsScrollEnabled" type="bool" default="true">
+  Whether the user can pan (scroll) the map.
+</ParamField>
+
+<ParamField path="body.Pins" type="IList<Pin>">
+  The collection of pins displayed on the map.
+</ParamField>
+
+<ParamField path="body.VisibleRegion" type="MapSpan">
+  Read-only. The current visible region of the map, updated when the map is panned or zoomed.
+</ParamField>
+
+## Pin properties
+
+| Property   | Type       | Description                                           |
+|------------|------------|-------------------------------------------------------|
+| `Label`    | `string`   | The title shown in the info window.                   |
+| `Address`  | `string`   | The subtitle shown in the info window.                |
+| `Location` | `Location` | The geographic coordinate of the pin.                 |
+
+## Pin events
+
+| Event            | Description                                              |
+|------------------|----------------------------------------------------------|
+| `MarkerClicked`  | Fired when the pin marker is tapped. Set `e.HideInfoWindow = true` to suppress the info window. |
+| `InfoWindowClicked` | Fired when the info window is tapped.                |
+
+## Platform support
+
+| Platform | Handler                       | Map tiles                |
+|----------|-------------------------------|--------------------------|
+| Android  | Native MAUI `MapHandler`      | Google Maps              |
+| iOS      | Native MAUI `MapHandler`      | Apple Maps               |
+| macOS    | Native MAUI `MapHandler`      | Apple Maps               |
+| Windows  | `MapHandlerWindows` (Toolkit) | Bing Maps (via WebView2) |
+
+<Note>
+  The Windows implementation uses a `WebView2` control to render Bing Maps via the Bing Maps JavaScript API. An active internet connection is required; the map remains blank when offline.
+</Note>
+
+<Note>
+  To obtain a Bing Maps API key, visit the [Bing Maps Dev Center](https://www.bingmapsportal.com/). Keep your key secure and do not commit it to source control.
+</Note>

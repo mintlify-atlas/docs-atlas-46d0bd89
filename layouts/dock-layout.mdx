@@ -1,0 +1,61 @@
+---
+title: "DockLayout"
+description: "A layout that docks child views to the edges or fills the remaining space."
+---
+
+`DockLayout` arranges its children by docking them to the top, bottom, left, or right edges of the container. One child can fill the remaining space in the center.
+
+## Basic usage
+
+```xml
+xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+
+<toolkit:DockLayout>
+  <!-- Top bar -->
+  <Label toolkit:DockLayout.DockPosition="Top"
+         Text="Header"
+         BackgroundColor="#04a4ec"
+         TextColor="White"
+         Padding="8" />
+
+  <!-- Bottom bar -->
+  <Label toolkit:DockLayout.DockPosition="Bottom"
+         Text="Footer"
+         BackgroundColor="#333"
+         TextColor="White"
+         Padding="8" />
+
+  <!-- Left panel -->
+  <BoxView toolkit:DockLayout.DockPosition="Left"
+           Color="LightGray"
+           WidthRequest="80" />
+
+  <!-- Fills remaining center space (Last child with no dock or Fill) -->
+  <ContentView toolkit:DockLayout.DockPosition="None"
+               BackgroundColor="White">
+    <Label Text="Main content" Margin="16" />
+  </ContentView>
+</toolkit:DockLayout>
+```
+
+## Properties
+
+<ParamField path="DockLayout.DockPosition" type="DockPosition">
+  Attached property. Sets where a child is docked. Values: `Top`, `Bottom`, `Left`, `Right`, `None` (fills remaining space).
+</ParamField>
+
+<ParamField path="HorizontalSpacing" type="double">
+  Space between horizontally adjacent children. Default: `0`.
+</ParamField>
+
+<ParamField path="VerticalSpacing" type="double">
+  Space between vertically adjacent children. Default: `0`.
+</ParamField>
+
+<ParamField path="ShouldExpandLastChild" type="bool">
+  When `true`, the last child fills remaining space. Default: `true`.
+</ParamField>
+
+<Note>
+  Children are laid out in the order they appear in XAML. Dock the fixed-size edges first (Top, Bottom, Left, Right), then place the fill child last.
+</Note>

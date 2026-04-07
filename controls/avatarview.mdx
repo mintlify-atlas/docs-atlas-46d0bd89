@@ -1,0 +1,183 @@
+---
+title: 'AvatarView'
+description: 'A circular or rounded view that displays either an image or initials text, suitable for representing users or contacts.'
+---
+
+`AvatarView` is a control that displays a user avatar — either an image or a text label with initials — inside a bordered, rounded container. It supports customizable corner radius, border width and color, font properties, and background color.
+
+<Info>
+  `AvatarView` is part of the core `CommunityToolkit.Maui` NuGet package.
+</Info>
+
+## Installation
+
+<Steps>
+  <Step title="Install the NuGet package">
+    ```bash
+    dotnet add package CommunityToolkit.Maui
+    ```
+  </Step>
+  <Step title="Initialize the toolkit">
+    ```csharp
+    var builder = MauiApp.CreateBuilder();
+    builder
+        .UseMauiApp<App>()
+        .UseMauiCommunityToolkit();
+    ```
+  </Step>
+</Steps>
+
+## Usage
+
+### XAML — text initials
+
+```xml
+<toolkit:AvatarView
+    Text="JD"
+    TextColor="White"
+    BackgroundColor="#5B4FCF"
+    BorderColor="#3B2FAF"
+    BorderWidth="2"
+    CornerRadius="28"
+    HeightRequest="56"
+    WidthRequest="56"
+    FontSize="20"
+    FontAttributes="Bold" />
+```
+
+### XAML — image avatar
+
+```xml
+<toolkit:AvatarView
+    ImageSource="user_photo.png"
+    CornerRadius="28"
+    HeightRequest="56"
+    WidthRequest="56"
+    BorderColor="Gray"
+    BorderWidth="1" />
+```
+
+When `ImageSource` is set, the image fills the avatar and the text label is hidden. When `ImageSource` is cleared or `null`, the text label is shown again.
+
+### XAML — data binding in a list
+
+```xml
+<CollectionView ItemsSource="{Binding Users}">
+    <CollectionView.ItemTemplate>
+        <DataTemplate x:DataType="models:UserModel">
+            <toolkit:AvatarView
+                Padding="{Binding Padding}"
+                BackgroundColor="{Binding BackgroundColor}"
+                BorderColor="{Binding BorderColor}"
+                BorderWidth="{Binding BorderWidth}"
+                CornerRadius="{Binding CornerRadius}"
+                FontSize="{Binding FontSize}"
+                HeightRequest="{Binding HeightRequest}"
+                ImageSource="{Binding ImageSource}"
+                Text="{Binding Text}"
+                TextColor="{Binding TextColor}"
+                WidthRequest="{Binding WidthRequest}" />
+        </DataTemplate>
+    </CollectionView.ItemTemplate>
+</CollectionView>
+```
+
+### C# — creating an avatar in code
+
+```csharp
+var avatar = new AvatarView
+{
+    Text = "AB",
+    TextColor = Colors.White,
+    BackgroundColor = Color.FromArgb("#E91E63"),
+    BorderColor = Colors.Transparent,
+    BorderWidth = 0,
+    CornerRadius = new CornerRadius(24),
+    HeightRequest = 48,
+    WidthRequest = 48,
+    FontSize = 18,
+    FontAttributes = FontAttributes.Bold
+};
+
+// Switch to an image later
+avatar.ImageSource = ImageSource.FromFile("profile.png");
+```
+
+## Properties
+
+<ParamField path="body.Text" type="string" default='"?"'>
+  The initials or text displayed when no `ImageSource` is set.
+</ParamField>
+
+<ParamField path="body.TextColor" type="Color">
+  The color of the text label.
+</ParamField>
+
+<ParamField path="body.ImageSource" type="ImageSource">
+  The image to display. When set, the image fills the avatar; the text label is hidden. Accepts any `ImageSource` (URI, file, stream, font icon).
+</ParamField>
+
+<ParamField path="body.BackgroundColor" type="Color">
+  The background fill color of the avatar.
+</ParamField>
+
+<ParamField path="body.BorderColor" type="Color" default="Transparent">
+  The color of the border stroke around the avatar.
+</ParamField>
+
+<ParamField path="body.BorderWidth" type="double" default="0">
+  The thickness of the border in device-independent units.
+</ParamField>
+
+<ParamField path="body.CornerRadius" type="CornerRadius" default="24">
+  The corner radius applied to all four corners. Pass a `CornerRadius` struct to set each corner independently, or a single value for uniform rounding.
+</ParamField>
+
+<ParamField path="body.HeightRequest" type="double" default="48">
+  The requested height of the avatar view.
+</ParamField>
+
+<ParamField path="body.WidthRequest" type="double" default="48">
+  The requested width of the avatar view.
+</ParamField>
+
+<ParamField path="body.Padding" type="Thickness" default="0">
+  Padding between the border and the avatar content.
+</ParamField>
+
+<ParamField path="body.FontSize" type="double">
+  The font size of the text label.
+</ParamField>
+
+<ParamField path="body.FontFamily" type="string">
+  The font family of the text label.
+</ParamField>
+
+<ParamField path="body.FontAttributes" type="FontAttributes">
+  Font style attributes such as `Bold` or `Italic`.
+</ParamField>
+
+<ParamField path="body.FontAutoScalingEnabled" type="bool">
+  Whether the font size scales with the device accessibility font scale.
+</ParamField>
+
+<ParamField path="body.CharacterSpacing" type="double">
+  The spacing between characters in the text label.
+</ParamField>
+
+<ParamField path="body.TextTransform" type="TextTransform">
+  Transforms applied to the display text, such as `Uppercase` or `Lowercase`.
+</ParamField>
+
+## Platform support
+
+| Platform | Supported |
+|----------|-----------|
+| Android  | Yes       |
+| iOS      | Yes       |
+| macOS    | Yes       |
+| Windows  | Yes       |
+
+<Note>
+  Image clipping to the rounded shape is handled differently per platform. On iOS and macOS, the platform natively clips the image layer. On Android and Windows, a `RoundRectangleGeometry` clip is applied programmatically.
+</Note>

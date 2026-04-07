@@ -1,0 +1,72 @@
+---
+title: "FolderPicker"
+description: "Let users select a folder using the native platform directory picker."
+---
+
+`FolderPicker` opens the platform's native folder selection dialog and returns the path the user chose.
+
+## Setup
+
+`IFolderPicker` is automatically registered when you call `UseMauiCommunityToolkit()`. Inject it into your ViewModel:
+
+```csharp
+public class MyViewModel
+{
+    readonly IFolderPicker folderPicker;
+
+    public MyViewModel(IFolderPicker folderPicker)
+    {
+        this.folderPicker = folderPicker;
+    }
+}
+```
+
+## Pick a folder
+
+```csharp
+var result = await folderPicker.PickAsync(CancellationToken.None);
+
+result.EnsureSuccess(); // Throws FolderPickerException on failure
+
+if (result.IsSuccessful)
+{
+    var folderPath = result.Folder.Path;
+    var folderName = result.Folder.Name;
+}
+```
+
+## Pick with an initial path
+
+```csharp
+var result = await folderPicker.PickAsync(
+    initialPath: Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+    cancellationToken: CancellationToken.None);
+```
+
+## FolderPickerResult
+
+<ParamField path="Folder" type="Folder">
+  The selected folder. Contains `Path` (full path) and `Name` (display name).
+</ParamField>
+
+<ParamField path="IsSuccessful" type="bool">
+  `true` when the user selected a folder successfully.
+</ParamField>
+
+<ParamField path="Exception" type="Exception?">
+  Contains the exception if the operation failed or was cancelled.
+</ParamField>
+
+## Platform support
+
+| Platform | Supported |
+|---|---|
+| iOS | Yes |
+| Android | Yes |
+| macOS Catalyst | Yes |
+| Windows | Yes |
+| Tizen | Yes |
+
+<Note>
+  On Android, accessing the selected folder may require additional permissions depending on the Android version and the location chosen.
+</Note>

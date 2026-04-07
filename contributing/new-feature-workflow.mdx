@@ -1,0 +1,45 @@
+---
+title: "New Feature Workflow"
+description: "The end-to-end process for proposing and landing a new feature in the toolkit."
+---
+
+All new features follow a structured workflow to ensure quality, community input, and proper documentation before merging.
+
+<Steps>
+  <Step title="Start a Discussion">
+    Open a [GitHub Discussion](https://github.com/CommunityToolkit/Maui/discussions/new) to propose your idea and get early feedback from the community. Keep the discussion focused and on-topic.
+  </Step>
+  <Step title="Submit a Proposal">
+    Once the idea is fleshed out, [open an issue](https://github.com/CommunityToolkit/Maui/issues/new/choose) with a full proposal. The issue should describe:
+    - What the feature does
+    - API design (types, methods, properties)
+    - Usage examples
+    - Platform considerations
+
+    Proposals are labelled as `proposal` by maintainers.
+  </Step>
+  <Step title="Champion the Proposal">
+    A toolkit core team member may champion your proposal, bringing it to the monthly [.NET MAUI Community Standup](https://www.youtube.com/watch?v=0ZBh2Hl54ZY) for broader visibility. Championed proposals are labelled `proposal champion`.
+  </Step>
+  <Step title="Get Approval">
+    The core team votes on the proposal. A majority (>50%) is required for approval. Once approved, you can open a pull request.
+  </Step>
+  <Step title="Submit a Pull Request">
+    Open a PR with:
+    - The feature implementation
+    - Unit tests
+    - A sample page added to the `CommunityToolkit.Maui.Sample` project
+
+    The proposal champion reviews and approves the PR.
+  </Step>
+  <Step title="Complete Documentation">
+    Before the PR can be merged, you must also submit a documentation PR to the [MicrosoftDocs/CommunityToolkit](https://github.com/MicrosoftDocs/CommunityToolkit) repository.
+  </Step>
+  <Step title="Merge">
+    Once the PR is approved and documentation is complete, the feature is merged into the toolkit.
+  </Step>
+</Steps>
+
+<Note>
+  You can start working on the implementation while awaiting approval, but be aware that the API design may change based on team feedback.
+</Note>

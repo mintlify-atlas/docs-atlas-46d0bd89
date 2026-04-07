@@ -1,0 +1,30 @@
+---
+title: Behaviors
+description: An overview of all behaviors included in the .NET MAUI Community Toolkit.
+---
+
+Behaviors let you add functionality to UI controls without subclassing them. They attach directly to a control and can respond to events, validate input, trigger animations, and more.
+
+All behaviors in the .NET MAUI Community Toolkit are available through the `http://schemas.microsoft.com/dotnet/2022/maui/toolkit` XML namespace:
+
+```xml
+xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+```
+
+<CardGroup cols={2}>
+  <Card title="Animation behavior" href="/behaviors/animation-behavior">
+    Trigger animations on any `VisualElement` via an event, tap gesture, or `ICommand`. Also covers `ProgressBarAnimationBehavior` for animating a `ProgressBar` to a target value.
+  </Card>
+  <Card title="Event to command behavior" href="/behaviors/event-to-command-behavior">
+    Map any control event to an `ICommand`. Also covers `MaskedBehavior`, `MaxLengthReachedBehavior`, `UserStoppedTypingBehavior`, and `SetFocusOnEntryCompletedBehavior`.
+  </Card>
+  <Card title="Touch behavior" href="/behaviors/touch-behavior">
+    Add rich press, release, hover, and long-press interactions to any `VisualElement` with animated state changes for scale, opacity, color, rotation, and translation.
+  </Card>
+  <Card title="Validation behaviors" href="/behaviors/validation-behaviors">
+    Validate user input with built-in rules for email, URI, numeric ranges, text length, character types, and regular expressions. Chain multiple validators with `MultiValidationBehavior`.
+  </Card>
+  <Card title="Platform behaviors" href="/behaviors/platform-behaviors">
+    Platform-specific behaviors including `IconTintColorBehavior` for tinting icons, `StatusBarBehavior` for controlling status bar color and style, and `SelectAllTextBehavior` for selecting all text on focus.
+  </Card>
+</CardGroup>

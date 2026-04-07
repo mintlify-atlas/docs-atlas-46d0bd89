@@ -1,0 +1,75 @@
+---
+title: "ColorAnimationExtensions"
+description: "Animate a VisualElement's BackgroundColor to a target color."
+---
+
+`ColorAnimationExtensions` adds a `BackgroundColorTo()` extension method to `VisualElement`, which smoothly animates the element's `BackgroundColor` from its current value to a target `Color`.
+
+## Usage
+
+```csharp
+using CommunityToolkit.Maui.Extensions;
+
+// Animate a button's background color to blue over 500ms
+await myButton.BackgroundColorTo(Colors.Blue, length: 500);
+
+// With custom rate and easing
+await myLabel.BackgroundColorTo(
+    color: Colors.Red,
+    rate: 16,
+    length: 300,
+    easing: Easing.CubicInOut,
+    token: CancellationToken.None);
+```
+
+## Method signature
+
+```csharp
+Task<bool> BackgroundColorTo(
+    this VisualElement element,
+    Color color,
+    uint rate = 16u,
+    uint length = 250u,
+    Easing? easing = null,
+    CancellationToken token = default)
+```
+
+<ParamField path="element" type="VisualElement">
+  The element whose `BackgroundColor` will be animated.
+</ParamField>
+
+<ParamField path="color" type="Color">
+  The target color to animate to.
+</ParamField>
+
+<ParamField path="rate" type="uint">
+  Time in milliseconds between animation frames. Default: `16` (≈60 fps).
+</ParamField>
+
+<ParamField path="length" type="uint">
+  Total duration of the animation in milliseconds. Default: `250`.
+</ParamField>
+
+<ParamField path="easing" type="Easing?">
+  The easing function. Default: `null` (linear).
+</ParamField>
+
+<ParamField path="token" type="CancellationToken">
+  Cancels the animation. Default: `CancellationToken.None`.
+</ParamField>
+
+Returns `true` if the animation completed successfully, `false` if it was interrupted.
+
+<Note>
+  If `BackgroundColor` is `null` when the animation starts, it is automatically set to `Colors.Transparent` to avoid a crash.
+</Note>
+
+## Example: pulse effect
+
+```csharp
+async Task PulseButton(Button button, CancellationToken token)
+{
+    await button.BackgroundColorTo(Colors.DarkBlue, length: 200, token: token);
+    await button.BackgroundColorTo(Colors.LightBlue, length: 200, token: token);
+}
+```

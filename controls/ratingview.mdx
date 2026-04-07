@@ -1,0 +1,216 @@
+---
+title: 'RatingView'
+description: 'A view that displays a row of tappable rating shapes and supports fractional, read-only, and fully customizable ratings.'
+---
+
+`RatingView` displays a configurable number of shapes (stars, hearts, circles, thumbs, or a custom SVG path) that users can tap to set a rating. It supports fractional ratings, two fill modes, multiple built-in shapes, custom SVG paths, and read-only mode.
+
+<Info>
+  `RatingView` is part of the core `CommunityToolkit.Maui` NuGet package.
+</Info>
+
+## Installation
+
+<Steps>
+  <Step title="Install the NuGet package">
+    ```bash
+    dotnet add package CommunityToolkit.Maui
+    ```
+  </Step>
+  <Step title="Initialize the toolkit">
+    ```csharp
+    var builder = MauiApp.CreateBuilder();
+    builder
+        .UseMauiApp<App>()
+        .UseMauiCommunityToolkit();
+    ```
+  </Step>
+</Steps>
+
+## Usage
+
+### XAML — basic rating view
+
+```xml
+<toolkit:RatingView
+    MaximumRating="5"
+    Rating="3.5"
+    FillColor="Gold"
+    EmptyShapeColor="LightGray"
+    Shape="Star"
+    ShapeBorderThickness="1"
+    ShapeDiameter="40"
+    RatingChanged="OnRatingChanged" />
+```
+
+### XAML — read-only rating
+
+```xml
+<toolkit:RatingView
+    MaximumRating="5"
+    Rating="4"
+    IsReadOnly="True"
+    FillColor="Gold"
+    EmptyShapeColor="LightGray"
+    Shape="Star" />
+```
+
+### XAML — background fill mode
+
+```xml
+<toolkit:RatingView
+    MaximumRating="5"
+    Rating="2.5"
+    FillColor="Blue"
+    EmptyShapeColor="Green"
+    FillOption="Background"
+    BackgroundColor="Purple"
+    Shape="Circle"
+    ShapeBorderThickness="1"
+    ShapeDiameter="40"
+    Spacing="4" />
+```
+
+### XAML — custom SVG shape
+
+```xml
+<toolkit:RatingView
+    MaximumRating="5"
+    Rating="5"
+    Shape="Custom"
+    CustomShapePath="M23.07 8h2.89l-6.015 5.957a5.621 5.621 0 01-7.89 0L6.035 8H8.93l4.57 4.523a3.556 3.556 0 004.996 0L23.07 8z"
+    FillColor="Red"
+    EmptyShapeColor="White"
+    ShapeBorderColor="Gray"
+    ShapeBorderThickness="1"
+    ShapeDiameter="40" />
+```
+
+### XAML — binding the rating value
+
+```xml
+<toolkit:RatingView
+    MaximumRating="5"
+    Rating="{Binding UserRating, Mode=TwoWay}"
+    FillColor="Gold"
+    EmptyShapeColor="LightGray"
+    Shape="Star" />
+```
+
+### C# — creating a rating view in code
+
+```csharp
+var ratingView = new RatingView
+{
+    MaximumRating = 5,
+    Rating = 3.5,
+    FillColor = Colors.Gold,
+    EmptyShapeColor = Colors.LightGray,
+    Shape = RatingViewShape.Star,
+    ShapeDiameter = 36,
+    ShapeBorderThickness = 1,
+    Spacing = 4,
+    IsReadOnly = false
+};
+
+ratingView.RatingChanged += (sender, e) =>
+{
+    Console.WriteLine($"New rating: {e.Rating}");
+};
+```
+
+### C# — handling the rating changed event
+
+```csharp
+void OnRatingChanged(object sender, RatingChangedEventArgs e)
+{
+    Console.WriteLine($"Rating changed to: {e.Rating}");
+}
+```
+
+## Properties
+
+<ParamField path="body.Rating" type="double" default="0">
+  The current rating value. Must be between `0` and `MaximumRating`. Supports fractional values (e.g. `2.5` renders a half-filled shape). Throws `ArgumentOutOfRangeException` if out of range.
+</ParamField>
+
+<ParamField path="body.MaximumRating" type="int" default="5">
+  The total number of rating shapes displayed. Must be a positive integer, up to the internal `MaximumRatingLimit`. Reducing this value below the current `Rating` also reduces `Rating`.
+</ParamField>
+
+<ParamField path="body.Shape" type="RatingViewShape" default="Star">
+  The shape used for each rating item. Built-in values: `Star`, `Circle`, `Heart`, `Like`, `Dislike`, `Custom`.
+</ParamField>
+
+<ParamField path="body.CustomShapePath" type="string">
+  An SVG path string used when `Shape` is set to `Custom`. Required when using the `Custom` shape; throws `InvalidOperationException` if `null` when `Custom` is selected.
+</ParamField>
+
+<ParamField path="body.FillColor" type="Color" default="Yellow">
+  The fill color for fully or partially rated shapes.
+</ParamField>
+
+<ParamField path="body.EmptyShapeColor" type="Color" default="Transparent">
+  The fill color for unrated shapes.
+</ParamField>
+
+<ParamField path="body.FillOption" type="RatingViewFillOption" default="Shape">
+  Controls what is filled when a rating is set. `Shape` fills the path geometry; `Background` fills the container border background.
+</ParamField>
+
+<ParamField path="body.ShapeDiameter" type="double" default="20">
+  The size (width and height) of each shape in device-independent units.
+</ParamField>
+
+<ParamField path="body.Spacing" type="double" default="0">
+  The space between adjacent rating shapes.
+</ParamField>
+
+<ParamField path="body.ShapeBorderColor" type="Color" default="Transparent">
+  The stroke color around each shape.
+</ParamField>
+
+<ParamField path="body.ShapeBorderThickness" type="double" default="0">
+  The stroke width around each shape in device-independent units. Must be `>= 0`.
+</ParamField>
+
+<ParamField path="body.ShapePadding" type="Thickness" default="0">
+  Padding applied inside each shape's container border.
+</ParamField>
+
+<ParamField path="body.IsReadOnly" type="bool" default="false">
+  When `true`, tap gestures are removed and the user cannot change the rating.
+</ParamField>
+
+## RatingViewShape enum
+
+| Value     | Description                                              |
+|-----------|----------------------------------------------------------|
+| `Star`    | A five-pointed star (default).                           |
+| `Circle`  | A filled circle.                                         |
+| `Heart`   | A heart shape.                                           |
+| `Like`    | A thumbs-up shape.                                       |
+| `Dislike` | A thumbs-down shape.                                     |
+| `Custom`  | A custom SVG path provided via `CustomShapePath`.        |
+
+## RatingViewFillOption enum
+
+| Value        | Description                                          |
+|--------------|------------------------------------------------------|
+| `Shape`      | The path geometry inside each shape is filled.       |
+| `Background` | The background of each shape container is filled.    |
+
+## Events
+
+| Event          | Args type               | Description                                      |
+|----------------|-------------------------|--------------------------------------------------|
+| `RatingChanged` | `RatingChangedEventArgs` | Fired when `Rating` changes. Contains the new `Rating` value. |
+
+## Platform support
+
+| Platform | Supported |
+|----------|-----------|
+| Android  | Yes       |
+| iOS      | Yes       |
+| macOS    | Yes       |
+| Windows  | Yes       |

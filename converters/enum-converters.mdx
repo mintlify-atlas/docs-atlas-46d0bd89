@@ -1,0 +1,71 @@
+---
+title: "Enum Converters"
+description: "EnumToBoolConverter and EnumToIntConverter for binding enum values in XAML."
+---
+
+## EnumToBoolConverter
+
+Returns `true` when the bound enum value equals the specified `TrueValue`, `false` otherwise. Useful for binding radio-button-style UI to an enum property.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:EnumToBoolConverter x:Key="IsSmallSize"   TrueValues="{x:Array Type={x:Type local:ShirtSize}, x:Arguments={x:Static local:ShirtSize.Small}}" />
+  <toolkit:EnumToBoolConverter x:Key="IsMediumSize"  TrueValues="{x:Array Type={x:Type local:ShirtSize}, x:Arguments={x:Static local:ShirtSize.Medium}}" />
+  <toolkit:EnumToBoolConverter x:Key="IsLargeSize"   TrueValues="{x:Array Type={x:Type local:ShirtSize}, x:Arguments={x:Static local:ShirtSize.Large}}" />
+</ContentPage.Resources>
+
+<RadioButton Content="Small"  IsChecked="{Binding Size, Converter={StaticResource IsSmallSize}}" />
+<RadioButton Content="Medium" IsChecked="{Binding Size, Converter={StaticResource IsMediumSize}}" />
+<RadioButton Content="Large"  IsChecked="{Binding Size, Converter={StaticResource IsLargeSize}}" />
+```
+
+### Simple single-value usage
+
+```xml
+<ContentPage.Resources>
+  <toolkit:EnumToBoolConverter x:Key="IsActiveStatus" TrueValue="{x:Static local:Status.Active}" />
+</ContentPage.Resources>
+
+<Label IsVisible="{Binding CurrentStatus, Converter={StaticResource IsActiveStatus}}" Text="Active" />
+```
+
+<ParamField path="TrueValue" type="object?">
+  The single enum value that evaluates to `true`.
+</ParamField>
+
+<ParamField path="TrueValues" type="IList">
+  A collection of enum values — any match returns `true`. Use when multiple enum values should map to `true`.
+</ParamField>
+
+---
+
+## EnumToIntConverter
+
+Converts an enum value to its underlying `int` representation, and back. Useful when binding to a `Picker.SelectedIndex` or a numeric API.
+
+```xml
+<ContentPage.Resources>
+  <toolkit:EnumToIntConverter x:Key="EnumToInt" />
+</ContentPage.Resources>
+
+<Picker SelectedIndex="{Binding SelectedPriority, Converter={StaticResource EnumToInt}}">
+  <Picker.Items>
+    <x:String>Low</x:String>
+    <x:String>Medium</x:String>
+    <x:String>High</x:String>
+  </Picker.Items>
+</Picker>
+```
+
+```csharp
+public enum Priority
+{
+    Low = 0,
+    Medium = 1,
+    High = 2
+}
+```
+
+<Note>
+  The converter uses `Convert.ToInt32()` to extract the value, so any integral enum backing type (`byte`, `short`, `int`, `long`) is supported.
+</Note>

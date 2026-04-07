@@ -1,0 +1,61 @@
+---
+title: "Contributing Overview"
+description: "How to contribute features, bug fixes, and improvements to the .NET MAUI Community Toolkit."
+---
+
+The .NET MAUI Community Toolkit is built by the community for the community. All contributions are welcome — whether it's a bug fix, a new feature, improved documentation, or sample code.
+
+## Before you start
+
+<Steps>
+  <Step title="Check existing issues and discussions">
+    Browse the [GitHub Issues](https://github.com/CommunityToolkit/Maui/issues) and [Discussions](https://github.com/CommunityToolkit/Maui/discussions) to see if someone else is working on the same thing.
+  </Step>
+  <Step title="Install prerequisites">
+    - Latest stable [.NET SDK](https://dotnet.microsoft.com/download)
+    - .NET MAUI workloads (use the Visual Studio installer or `dotnet workload install maui`)
+  </Step>
+  <Step title="Sign the CLA">
+    Before any PR can be accepted, you must complete the [.NET Foundation Contributor License Agreement](https://cla.dotnetfoundation.org/). A bot will prompt you when you open a PR.
+  </Step>
+</Steps>
+
+## How to open a PR
+
+1. Find an approved issue or feature request on GitHub
+2. Fork the repository
+3. Create a branch from `main`
+4. Implement your changes (see [Code Standards](/contributing/code-standards))
+5. Add unit tests and a sample to the sample app
+6. Open a pull request — keep it small and focused
+
+<Tip>
+  Small, focused PRs are reviewed and merged much faster than large ones. If your change is big, break it into a series of smaller PRs.
+</Tip>
+
+## What every contribution needs
+
+Every new feature or change requires:
+
+| Requirement | Description |
+|---|---|
+| Tests | Unit tests covering the new behavior |
+| Sample | A sample page added to `CommunityToolkit.Maui.Sample` |
+| Documentation | A PR to the [MicrosoftDocs/CommunityToolkit](https://github.com/MicrosoftDocs/CommunityToolkit) documentation repository |
+
+## Reporting a bug
+
+Open a [GitHub Issue](https://github.com/CommunityToolkit/Maui/issues/new/choose) using the bug report template. You **must** include a minimal reproduction project hosted on GitHub or GitLab. ZIP files are not accepted.
+
+## Code of conduct
+
+This project follows the [.NET Foundation Code of Conduct](https://dotnetfoundation.org/code-of-conduct). Be kind, assume good intent, and remember that everyone is volunteering their time.
+
+<CardGroup cols={2}>
+  <Card title="New feature workflow" icon="diagram-project" href="/contributing/new-feature-workflow">
+    How proposals go from idea to merged feature.
+  </Card>
+  <Card title="Code standards" icon="code" href="/contributing/code-standards">
+    Coding conventions and best practices used across the toolkit.
+  </Card>
+</CardGroup>

@@ -1,0 +1,87 @@
+---
+title: "Platform Behaviors"
+description: "IconTintColorBehavior, StatusBarBehavior, and SelectAllTextBehavior for platform-specific UI customization."
+---
+
+Platform behaviors apply platform-native features that are not available in the standard .NET MAUI cross-platform API. They use `PlatformBehavior<TView, TPlatformView>` under the hood.
+
+## IconTintColorBehavior
+
+Tints an `Image` to a specified color, allowing you to reuse a single image asset across different visual themes.
+
+```xml
+<Image Source="heart.png" WidthRequest="32" HeightRequest="32">
+  <Image.Behaviors>
+    <toolkit:IconTintColorBehavior TintColor="{StaticResource Primary}" />
+  </Image.Behaviors>
+</Image>
+```
+
+### C# usage
+
+```csharp
+var image = new Image { Source = "heart.png" };
+image.Behaviors.Add(new IconTintColorBehavior
+{
+    TintColor = Colors.Red
+});
+```
+
+<ParamField path="TintColor" type="Color?">
+  The color to apply to the image. Set to `null` to remove the tint.
+</ParamField>
+
+**Platform support:** iOS, Android, macOS Catalyst, Windows.
+
+---
+
+## StatusBarBehavior
+
+Controls the status bar color and text style on a `Page`. Attach it directly to any `ContentPage` or `Page` subclass.
+
+<Warning>
+  `StatusBarBehavior` is supported on iOS and Android only. It is not supported on Windows, macOS Catalyst, or Tizen.
+</Warning>
+
+```xml
+<ContentPage xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit">
+  <ContentPage.Behaviors>
+    <toolkit:StatusBarBehavior
+      StatusBarColor="#04a4ec"
+      StatusBarStyle="LightContent"
+      ApplyOn="OnPageNavigatedTo" />
+  </ContentPage.Behaviors>
+</ContentPage>
+```
+
+<ParamField path="StatusBarColor" type="Color">
+  The background color of the status bar.
+</ParamField>
+
+<ParamField path="StatusBarStyle" type="StatusBarStyle">
+  The style of status bar content. Values: `Default`, `LightContent`, `DarkContent`.
+</ParamField>
+
+<ParamField path="ApplyOn" type="StatusBarApplyOn">
+  When to apply the color and style. `OnBehaviorAttachedTo` (default) applies immediately; `OnPageNavigatedTo` applies after navigation completes.
+</ParamField>
+
+**Platform support:** iOS 15+, Android 21+.
+
+---
+
+## SelectAllTextBehavior
+
+Automatically selects all text in an `InputView` (e.g., `Entry`, `Editor`) when it receives focus.
+
+```xml
+<Entry Placeholder="Tap to select all">
+  <Entry.Behaviors>
+    <toolkit:SelectAllTextBehavior />
+  </Entry.Behaviors>
+</Entry>
+```
+
+No additional properties are needed — attach the behavior and it handles selection automatically.
+
+**Platform support:** iOS, Android, macOS Catalyst, Windows.

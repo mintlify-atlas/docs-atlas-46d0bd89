@@ -1,0 +1,209 @@
+---
+title: 'CameraView'
+description: 'A cross-platform view that shows a live camera preview and supports image capture and video recording.'
+---
+
+`CameraView` is a view that renders a live camera preview and exposes methods and commands for capturing images, recording video, and controlling camera settings such as flash mode, zoom, and resolution.
+
+<Info>
+  `CameraView` is distributed in a separate NuGet package: `CommunityToolkit.Maui.Camera`.
+</Info>
+
+## Installation
+
+<Steps>
+  <Step title="Install the NuGet package">
+    ```bash
+    dotnet add package CommunityToolkit.Maui.Camera
+    ```
+  </Step>
+  <Step title="Initialize the toolkit">
+    ```csharp
+    var builder = MauiApp.CreateBuilder();
+    builder
+        .UseMauiApp<App>()
+        .UseMauiCommunityToolkitCamera();
+    ```
+  </Step>
+  <Step title="Add required platform permissions">
+    Add `CAMERA` (Android) and `NSCameraUsageDescription` (iOS/macOS) to your platform manifests. For video recording, also add microphone permissions.
+  </Step>
+</Steps>
+
+## Usage
+
+### XAML
+
+```xml
+<toolkit:CameraView
+    x:Name="Camera"
+    CameraFlashMode="{Binding FlashMode}"
+    ZoomFactor="{Binding CurrentZoom}"
+    ImageCaptureResolution="{Binding SelectedResolution}"
+    SelectedCamera="{Binding SelectedCamera}"
+    MediaCaptured="OnMediaCaptured"
+    MediaCaptureFailed="OnMediaCaptureFailed" />
+```
+
+Bind commands directly from XAML:
+
+```xml
+<Button Command="{Binding CaptureImageCommand, Source={x:Reference Camera}, x:DataType=toolkit:CameraView}"
+        CommandParameter="{Binding Token}"
+        Text="Capture Image" />
+
+<Button Command="{Binding StartCameraPreviewCommand, Source={x:Reference Camera}, x:DataType=toolkit:CameraView}"
+        CommandParameter="{Binding Token}"
+        Text="Start Preview" />
+
+<Button Command="{Binding StopCameraPreviewCommand, Source={x:Reference Camera}, x:DataType=toolkit:CameraView}"
+        Text="Stop Preview" />
+```
+
+### C# — enumerating cameras and starting preview
+
+```csharp
+// Get available cameras
+var cameras = await cameraView.GetAvailableCameras(CancellationToken.None);
+
+// Select the first available camera
+cameraView.SelectedCamera = cameras.FirstOrDefault();
+
+// Start the camera preview
+await cameraView.StartCameraPreview(CancellationToken.None);
+```
+
+### C# — capturing an image
+
+```csharp
+try
+{
+    var imageStream = await cameraView.CaptureImage(CancellationToken.None);
+
+    // Use the stream, e.g. display in an Image view
+    capturedImage.Source = ImageSource.FromStream(() => imageStream);
+}
+catch (CameraException ex)
+{
+    await DisplayAlert("Capture failed", ex.Message, "OK");
+}
+```
+
+### C# — recording video
+
+```csharp
+// Start recording into a MemoryStream
+var outputStream = new MemoryStream();
+await cameraView.StartVideoRecording(outputStream, CancellationToken.None);
+
+// Later, stop recording and retrieve the stream
+var videoStream = await cameraView.StopVideoRecording(CancellationToken.None);
+```
+
+### C# — handling capture events
+
+```csharp
+cameraView.MediaCaptured += OnMediaCaptured;
+cameraView.MediaCaptureFailed += OnMediaCaptureFailed;
+
+void OnMediaCaptured(object sender, MediaCapturedEventArgs e)
+{
+    // e.Media is a Stream containing the captured image data
+    capturedImage.Source = ImageSource.FromStream(() => e.Media);
+}
+
+void OnMediaCaptureFailed(object sender, MediaCaptureFailedEventArgs e)
+{
+    Console.WriteLine($"Capture failed: {e.FailureReason}");
+}
+```
+
+## Properties
+
+<ParamField path="body.SelectedCamera" type="CameraInfo">
+  Gets or sets the active camera. Set from the list returned by `GetAvailableCameras`. Supports two-way binding.
+</ParamField>
+
+<ParamField path="body.CameraFlashMode" type="CameraFlashMode" default="Off">
+  The flash mode used during image capture. Values: `Off`, `On`, `Auto`.
+</ParamField>
+
+<ParamField path="body.IsTorchOn" type="bool" default="false">
+  Enables or disables the camera torch (flashlight). Available on supported devices only.
+</ParamField>
+
+<ParamField path="body.ZoomFactor" type="float" default="1.0">
+  The current zoom level. Coerced to the range `[SelectedCamera.MinimumZoomFactor, SelectedCamera.MaximumZoomFactor]`. Supports two-way binding.
+</ParamField>
+
+<ParamField path="body.ImageCaptureResolution" type="Size">
+  The desired resolution for captured images. Must be a value from `SelectedCamera.SupportedResolutions`. Supports two-way binding.
+</ParamField>
+
+<ParamField path="body.IsAvailable" type="bool">
+  Read-only. Indicates whether a camera is available on the device.
+</ParamField>
+
+<ParamField path="body.IsBusy" type="bool">
+  Read-only. Indicates whether the camera is currently busy (e.g. capturing or recording).
+</ParamField>
+
+## Commands
+
+All commands are read-only bindable properties automatically created by `CameraView`.
+
+| Command                     | Parameter type         | Description                                      |
+|-----------------------------|------------------------|--------------------------------------------------|
+| `CaptureImageCommand`       | `CancellationToken`    | Triggers an image capture.                       |
+| `StartCameraPreviewCommand` | `CancellationToken`    | Starts the live camera preview.                  |
+| `StopCameraPreviewCommand`  | none                   | Stops the live camera preview.                   |
+| `StartVideoRecordingCommand`| `Stream`               | Starts video recording, writing to the given stream. |
+| `StopVideoRecordingCommand` | `CancellationToken`    | Stops video recording and finalizes the stream.  |
+
+## Methods
+
+| Method                              | Return type                   | Description                                           |
+|-------------------------------------|-------------------------------|-------------------------------------------------------|
+| `GetAvailableCameras(CancellationToken)` | `ValueTask<IReadOnlyList<CameraInfo>>` | Returns all cameras available on the device. |
+| `CaptureImage(CancellationToken)`   | `Task<Stream>`                | Captures a still image and returns it as a `Stream`.  |
+| `StartCameraPreview(CancellationToken)` | `Task`                    | Starts the live preview.                              |
+| `StopCameraPreview()`               | `void`                        | Stops the live preview.                               |
+| `StartVideoRecording(CancellationToken)` | `Task`                   | Starts recording to an internal `MemoryStream`.       |
+| `StartVideoRecording(Stream, CancellationToken)` | `Task`           | Starts recording to the given stream.                 |
+| `StopVideoRecording(CancellationToken)` | `Task<Stream>`            | Stops recording and returns the video stream.         |
+
+## Events
+
+| Event                | Args type                    | Description                                  |
+|----------------------|------------------------------|----------------------------------------------|
+| `MediaCaptured`      | `MediaCapturedEventArgs`     | Fired when an image is successfully captured. Contains `Media` (`Stream`). |
+| `MediaCaptureFailed` | `MediaCaptureFailedEventArgs` | Fired when image capture fails. Contains `FailureReason`. |
+
+## CameraInfo properties
+
+`CameraInfo` describes a physical camera and is returned by `GetAvailableCameras`:
+
+| Property              | Type                  | Description                              |
+|-----------------------|-----------------------|------------------------------------------|
+| `Name`                | `string`              | Human-readable camera name.              |
+| `MinimumZoomFactor`   | `float`               | Minimum supported zoom level.            |
+| `MaximumZoomFactor`   | `float`               | Maximum supported zoom level.            |
+| `SupportedResolutions`| `IReadOnlyList<Size>` | Resolutions available for image capture. |
+| `IsFlashSupported`    | `bool`                | Whether this camera supports flash.      |
+
+## Platform support
+
+| Platform | Preview | Image capture | Video recording |
+|----------|---------|---------------|-----------------|
+| Android  | Yes     | Yes           | Yes             |
+| iOS      | Yes     | Yes           | Yes             |
+| macOS    | Yes     | Yes           | Yes             |
+| Windows  | Yes     | Yes           | Yes             |
+
+<Warning>
+  `CameraView` implements `IDisposable`. Call `Dispose()` when the page is destroyed to release camera hardware resources.
+</Warning>
+
+<Note>
+  On Android, you can call `SetExtensionMode(int mode)` to enable camera extensions such as night mode, bokeh, or HDR on supported devices.
+</Note>

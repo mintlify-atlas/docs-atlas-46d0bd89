@@ -1,0 +1,180 @@
+---
+title: 'DrawingView'
+description: 'A canvas view that allows users to draw single or multiple lines, and export the result as an image stream.'
+---
+
+`DrawingView` is a view that enables freehand drawing on a canvas. It supports single-line and multi-line modes, custom line colors and widths, programmatic line management, and exporting the drawing as an image stream.
+
+<Info>
+  `DrawingView` is part of the core `CommunityToolkit.Maui` NuGet package.
+</Info>
+
+## Installation
+
+<Steps>
+  <Step title="Install the NuGet package">
+    ```bash
+    dotnet add package CommunityToolkit.Maui
+    ```
+  </Step>
+  <Step title="Initialize the toolkit">
+    ```csharp
+    var builder = MauiApp.CreateBuilder();
+    builder
+        .UseMauiApp<App>()
+        .UseMauiCommunityToolkit();
+    ```
+  </Step>
+</Steps>
+
+## Usage
+
+### XAML
+
+```xml
+<toolkit:DrawingView
+    x:Name="DrawingViewControl"
+    LineColor="Green"
+    LineWidth="5"
+    IsMultiLineModeEnabled="True"
+    ShouldClearOnFinish="False"
+    Lines="{Binding Lines, Mode=TwoWay}"
+    DrawingLineCompleted="OnDrawingLineCompleted"
+    DrawingLineCompletedCommand="{Binding DrawingLineCompletedCommand}"
+    DrawingLineStartedCommand="{Binding DrawingLineStartedCommand}"
+    DrawingLineCancelledCommand="{Binding DrawingLineCancelledCommand}"
+    PointDrawnCommand="{Binding PointDrawnCommand}">
+    <toolkit:DrawingView.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="Blue" Offset="0" />
+            <GradientStop Color="Yellow" Offset="1" />
+        </LinearGradientBrush>
+    </toolkit:DrawingView.Background>
+</toolkit:DrawingView>
+```
+
+### C# — handling drawing events
+
+```csharp
+drawingView.DrawingLineCompleted += OnDrawingLineCompleted;
+
+void OnDrawingLineCompleted(object sender, DrawingLineCompletedEventArgs e)
+{
+    // e.LastDrawingLine contains the completed IDrawingLine
+    var line = e.LastDrawingLine;
+    Console.WriteLine($"Line has {line.Points.Count} points");
+}
+```
+
+### C# — exporting the drawing to an image
+
+```csharp
+// Export just the drawn lines (transparent background for non-drawn areas)
+using var stream = await drawingView.GetImageStream(
+    desiredWidth: 400,
+    desiredHeight: 300);
+
+capturedImage.Source = ImageSource.FromStream(() => stream);
+
+// Export the full canvas (including the view background)
+using var fullStream = await drawingView.GetImageStream(
+    desiredWidth: 400,
+    desiredHeight: 300,
+    DrawingViewOutputOption.FullCanvas);
+```
+
+### C# — static image generation from lines
+
+```csharp
+// Generate an image from a list of lines without needing a DrawingView on screen
+var options = ImageLineOptions.JustLines(
+    lines: myLines,
+    imageSize: new Size(800, 600),
+    background: new SolidColorBrush(Colors.White));
+
+using var stream = await DrawingView.GetImageStream(options, CancellationToken.None);
+```
+
+### C# — programmatic line management
+
+```csharp
+// Clear all lines
+drawingView.Clear();
+
+// Add lines programmatically via the Lines collection
+drawingView.Lines.Add(new DrawingLine
+{
+    Points = new ObservableCollection<PointF> { new(10, 10), new(100, 100) },
+    LineColor = Colors.Red,
+    LineWidth = 3
+});
+```
+
+## Properties
+
+<ParamField path="body.Lines" type="ObservableCollection<IDrawingLine>" default="[]">
+  The collection of lines currently drawn on the canvas. Supports two-way binding. Modify this collection to add or remove lines programmatically.
+</ParamField>
+
+<ParamField path="body.LineColor" type="Color" default="Black">
+  The default color used for new lines drawn by the user.
+</ParamField>
+
+<ParamField path="body.LineWidth" type="float" default="5">
+  The default stroke width in device-independent units for new lines drawn by the user.
+</ParamField>
+
+<ParamField path="body.IsMultiLineModeEnabled" type="bool" default="false">
+  When `true`, the user can draw multiple lines without clearing the canvas between strokes.
+</ParamField>
+
+<ParamField path="body.ShouldClearOnFinish" type="bool" default="false">
+  When `true`, the canvas is cleared automatically after each drawing stroke completes.
+</ParamField>
+
+<ParamField path="body.DrawAction" type="Action<ICanvas, RectF>">
+  An optional custom drawing action that is called in addition to rendering lines. Use this to draw shapes, text, or other graphics on the canvas.
+</ParamField>
+
+<ParamField path="body.DrawingLineCompletedCommand" type="ICommand">
+  A command executed when a line is completed. Receives the completed `IDrawingLine` as the command parameter.
+</ParamField>
+
+<ParamField path="body.DrawingLineStartedCommand" type="ICommand">
+  A command executed when a new line is started. Receives the starting `PointF` as the command parameter.
+</ParamField>
+
+<ParamField path="body.DrawingLineCancelledCommand" type="ICommand">
+  A command executed when a drawing stroke is cancelled (e.g. the touch is lifted without completing a line).
+</ParamField>
+
+<ParamField path="body.PointDrawnCommand" type="ICommand">
+  A command executed for each point drawn. Receives the current `PointF` as the command parameter.
+</ParamField>
+
+## Methods
+
+| Method | Description |
+|--------|-------------|
+| `Clear()` | Removes all lines from the `Lines` collection. |
+| `GetImageStream(double, double, CancellationToken)` | Exports the drawn lines as a `Stream` at the specified dimensions. |
+| `GetImageStream(double, double, DrawingViewOutputOption, CancellationToken)` | Exports as a `Stream` with the specified output option (`Lines` or `FullCanvas`). |
+| `static GetImageStream(ImageLineOptions, CancellationToken)` | Generates an image stream from a list of lines without needing a live view. |
+
+## Events
+
+| Event                   | Args type                      | Description                                        |
+|-------------------------|--------------------------------|----------------------------------------------------|
+| `DrawingLineCompleted`  | `DrawingLineCompletedEventArgs` | Fired when a stroke is finished. Contains `LastDrawingLine`. |
+| `DrawingLineStarted`    | `DrawingLineStartedEventArgs`   | Fired when a stroke begins. Contains the starting `Point`. |
+| `DrawingLineCancelled`  | `EventArgs`                     | Fired when a stroke is cancelled.                  |
+| `PointDrawn`            | `PointDrawnEventArgs`           | Fired for each point added during drawing.         |
+
+## Platform support
+
+| Platform | Supported |
+|----------|-----------|
+| Android  | Yes       |
+| iOS      | Yes       |
+| macOS    | Yes       |
+| Windows  | Yes       |

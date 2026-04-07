@@ -1,0 +1,100 @@
+---
+title: "StateContainer"
+description: "Make any Layout state-aware — show different views for Loading, Error, Empty, and custom states."
+---
+
+`StateContainer` is a set of attached properties that make any `Layout` element state-aware. You define `StateView` children for each named state. When `CurrentState` changes, the layout automatically swaps between the normal content and the matching state view.
+
+## Basic usage
+
+```xml
+xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+
+<VerticalStackLayout
+  toolkit:StateContainer.CurrentState="{Binding CurrentState}">
+
+  <toolkit:StateContainer.StateViews>
+    <!-- Loading state -->
+    <toolkit:StateView StateKey="Loading">
+      <ActivityIndicator IsRunning="True" HorizontalOptions="Center" VerticalOptions="Center" />
+    </toolkit:StateView>
+
+    <!-- Empty state -->
+    <toolkit:StateView StateKey="Empty">
+      <Label Text="No items found." HorizontalOptions="Center" />
+    </toolkit:StateView>
+
+    <!-- Error state -->
+    <toolkit:StateView StateKey="Error">
+      <Label Text="Something went wrong." TextColor="Red" HorizontalOptions="Center" />
+    </toolkit:StateView>
+  </toolkit:StateContainer.StateViews>
+
+  <!-- Default content (shown when CurrentState is null or empty) -->
+  <CollectionView ItemsSource="{Binding Items}">
+    <!-- ... -->
+  </CollectionView>
+</VerticalStackLayout>
+```
+
+## ViewModel integration
+
+```csharp ViewModel.cs
+public string? CurrentState
+{
+    get => _currentState;
+    set => SetProperty(ref _currentState, value);
+}
+
+async Task LoadData()
+{
+    CurrentState = "Loading";
+    try
+    {
+        var data = await _service.GetItemsAsync();
+        Items = data;
+        CurrentState = data.Count == 0 ? "Empty" : null; // null = show default content
+    }
+    catch
+    {
+        CurrentState = "Error";
+    }
+}
+```
+
+## Animated state transitions
+
+Use `StateContainer.ChangeStateWithAnimation()` to animate state changes:
+
+```csharp
+await StateContainer.ChangeStateWithAnimation(
+    myLayout,
+    "Loading",
+    beforeStateChange: new Animation(v => myLayout.Opacity = v, 1, 0),
+    afterStateChange: new Animation(v => myLayout.Opacity = v, 0, 1),
+    cancellationToken: default);
+```
+
+## Attached properties
+
+<ParamField path="StateContainer.CurrentState" type="string?">
+  The key of the currently active state. Set to `null` or `""` to show the default content.
+</ParamField>
+
+<ParamField path="StateContainer.StateViews" type="IList&lt;View&gt;">
+  Collection of `StateView` elements defining each possible state.
+</ParamField>
+
+<ParamField path="StateContainer.CanStateChange" type="bool">
+  OneWayToSource. `true` when no state transition animation is in progress. Check this before changing state to avoid `StateContainerException`.
+</ParamField>
+
+## StateView properties
+
+<ParamField path="StateKey" type="string">
+  The identifier for this state. Must match a value used in `CurrentState`.
+</ParamField>
+
+<Note>
+  When `CurrentState` is `null` or an empty string, the original layout content (non-`StateView` children) is shown.
+</Note>

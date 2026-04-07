@@ -1,0 +1,143 @@
+---
+title: "TouchBehavior"
+description: "Add rich press, hover, and long-press interactions with animations to any VisualElement."
+---
+
+`TouchBehavior` adds touch interaction support — including pressed/released/hovered visual states with animated scale, opacity, color, and translation changes — to any `VisualElement`.
+
+## Basic usage
+
+```xml
+<Image Source="icon.png" WidthRequest="80">
+  <Image.Behaviors>
+    <toolkit:TouchBehavior
+      DefaultAnimationDuration="250"
+      DefaultAnimationEasing="{x:Static Easing.CubicInOut}"
+      PressedOpacity="0.6"
+      PressedScale="0.95"
+      Command="{Binding TapCommand}" />
+  </Image.Behaviors>
+</Image>
+```
+
+## Visual states
+
+`TouchBehavior` integrates with the .NET MAUI Visual State Manager using three states:
+
+| State name | Constant | Triggered when |
+|---|---|---|
+| `Unpressed` | `TouchBehavior.UnpressedVisualState` | Default/released |
+| `Pressed` | `TouchBehavior.PressedVisualState` | Finger/mouse down |
+| `Hovered` | `TouchBehavior.HoveredVisualState` | Mouse hover (desktop) |
+
+```xml
+<Label Text="Tap me">
+  <Label.Behaviors>
+    <toolkit:TouchBehavior />
+  </Label.Behaviors>
+  <VisualStateManager.VisualStateGroups>
+    <VisualStateGroup x:Name="TouchBehaviorStates">
+      <VisualState x:Name="Unpressed">
+        <VisualState.Setters>
+          <Setter Property="TextColor" Value="Black" />
+        </VisualState.Setters>
+      </VisualState>
+      <VisualState x:Name="Pressed">
+        <VisualState.Setters>
+          <Setter Property="TextColor" Value="Gray" />
+        </VisualState.Setters>
+      </VisualState>
+    </VisualStateGroup>
+  </VisualStateManager.VisualStateGroups>
+</Label>
+```
+
+## Properties
+
+<ParamField path="IsEnabled" type="bool">
+  Enables or disables the touch behavior. Default: `true`.
+</ParamField>
+
+<ParamField path="Command" type="ICommand?">
+  Command executed when a touch gesture completes (tap).
+</ParamField>
+
+<ParamField path="CommandParameter" type="object?">
+  Parameter passed to `Command`.
+</ParamField>
+
+<ParamField path="LongPressCommand" type="ICommand?">
+  Command executed on long press.
+</ParamField>
+
+<ParamField path="LongPressCommandParameter" type="object?">
+  Parameter passed to `LongPressCommand`.
+</ParamField>
+
+<ParamField path="LongPressDuration" type="int">
+  Duration in milliseconds before a long press is triggered. Default: `500`.
+</ParamField>
+
+<ParamField path="DefaultAnimationDuration" type="int">
+  Duration of the release animation in milliseconds. Default: `250`.
+</ParamField>
+
+<ParamField path="DefaultAnimationEasing" type="Easing?">
+  Easing for the release animation.
+</ParamField>
+
+<ParamField path="PressedAnimationDuration" type="int">
+  Duration of the press animation in milliseconds. Default: `250`.
+</ParamField>
+
+<ParamField path="PressedAnimationEasing" type="Easing?">
+  Easing for the press animation.
+</ParamField>
+
+<ParamField path="PressedOpacity" type="double">
+  Opacity of the element when pressed. Default: `1.0`.
+</ParamField>
+
+<ParamField path="PressedScale" type="double">
+  Scale of the element when pressed. Default: `1.0`.
+</ParamField>
+
+<ParamField path="PressedTranslationX" type="double">
+  X translation when pressed. Default: `0`.
+</ParamField>
+
+<ParamField path="PressedTranslationY" type="double">
+  Y translation when pressed. Default: `0`.
+</ParamField>
+
+<ParamField path="PressedRotation" type="double">
+  Rotation (degrees) when pressed. Default: `0`.
+</ParamField>
+
+<ParamField path="NativeAnimation" type="bool">
+  When `true`, uses the platform's native ripple/press animation instead of the toolkit's animation engine. Default: `false`.
+</ParamField>
+
+<ParamField path="NativeAnimationColor" type="Color?">
+  Color of the native ripple animation (Android only).
+</ParamField>
+
+<ParamField path="NativeAnimationRadius" type="int">
+  Radius of the native ripple (Android only). Default: `-1` (auto).
+</ParamField>
+
+## Events
+
+| Event | Args type | Description |
+|---|---|---|
+| `CurrentTouchStatusChanged` | `TouchStatusChangedEventArgs` | Fires when touch status changes |
+| `CurrentTouchStateChanged` | `TouchStateChangedEventArgs` | Fires when touch state changes |
+| `InteractionStatusChanged` | `TouchInteractionStatusChangedEventArgs` | Fires on interaction status change |
+| `HoverStatusChanged` | `HoverStatusChangedEventArgs` | Fires on hover status change |
+| `HoverStateChanged` | `HoverStateChangedEventArgs` | Fires on hover state change |
+| `TouchGestureCompleted` | `TouchGestureCompletedEventArgs` | Fires on completed tap |
+| `LongPressCompleted` | `LongPressCompletedEventArgs` | Fires on long press |
+
+<Note>
+  `NativeAnimation` and `NativeAnimationColor` only apply on Android. On iOS, the standard toolkit animations are used.
+</Note>

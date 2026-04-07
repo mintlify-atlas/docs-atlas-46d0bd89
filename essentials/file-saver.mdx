@@ -1,0 +1,86 @@
+---
+title: "FileSaver"
+description: "Save files to the user's chosen location using the platform file picker."
+---
+
+`FileSaver` lets you prompt the user to choose a save location and write a file there. It uses the native save dialog on each platform.
+
+## Setup
+
+`IFileSaver` is automatically registered when you call `UseMauiCommunityToolkit()`. Inject it into your ViewModel:
+
+```csharp
+public class MyViewModel
+{
+    readonly IFileSaver fileSaver;
+
+    public MyViewModel(IFileSaver fileSaver)
+    {
+        this.fileSaver = fileSaver;
+    }
+}
+```
+
+## Save a file
+
+```csharp
+using var stream = new MemoryStream(Encoding.UTF8.GetBytes("Hello, World!"));
+
+var result = await fileSaver.SaveAsync(
+    initialPath: Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+    fileName: "hello.txt",
+    stream: stream,
+    cancellationToken: CancellationToken.None);
+
+result.EnsureSuccess(); // Throws FileSaveException on failure
+
+if (result.IsSuccessful)
+{
+    var savedPath = result.FilePath;
+}
+```
+
+## FileSaverResult
+
+<ParamField path="FilePath" type="string?">
+  The full path where the file was saved. `null` if the user cancelled.
+</ParamField>
+
+<ParamField path="IsSuccessful" type="bool">
+  `true` when the file was saved successfully.
+</ParamField>
+
+<ParamField path="Exception" type="Exception?">
+  Contains the exception if the save failed.
+</ParamField>
+
+```csharp
+// Check result manually
+if (!result.IsSuccessful)
+{
+    await DisplayAlert("Error", result.Exception?.Message, "OK");
+}
+```
+
+## Extension methods
+
+`FileSaverExtensions` provides convenience overloads:
+
+```csharp
+// Save without specifying an initial path
+var result = await fileSaver.SaveAsync("report.pdf", pdfStream, CancellationToken.None);
+```
+
+## Platform support
+
+| Platform | Supported |
+|---|---|
+| iOS | Yes |
+| Android | Yes |
+| macOS Catalyst | Yes |
+| Windows | Yes |
+| Tizen | Yes |
+
+<Note>
+  On Android, the file is saved to the user-selected location via the Storage Access Framework. On iOS, the user chooses a location via the document picker.
+</Note>

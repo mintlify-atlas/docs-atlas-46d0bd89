@@ -1,0 +1,227 @@
+---
+title: 'MediaElement'
+description: 'A cross-platform view for playing audio and video from URIs, embedded resources, or local files.'
+---
+
+`MediaElement` is a cross-platform view that renders audio and video. It supports remote URLs, local files, and embedded resources, with built-in playback controls, looping, muting, speed adjustment, volume control, and metadata for lock screen / notification integration.
+
+<Info>
+  `MediaElement` is distributed in a separate NuGet package: `CommunityToolkit.Maui.MediaElement`. It is not included in the core `CommunityToolkit.Maui` package.
+</Info>
+
+## Installation
+
+<Steps>
+  <Step title="Install the NuGet package">
+    ```bash
+    dotnet add package CommunityToolkit.Maui.MediaElement
+    ```
+  </Step>
+  <Step title="Initialize the toolkit">
+    ```csharp
+    var builder = MauiApp.CreateBuilder();
+    builder
+        .UseMauiApp<App>()
+        .UseMauiCommunityToolkitMediaElement();
+    ```
+  </Step>
+  <Step title="Add the XML namespace in XAML">
+    ```xml
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    ```
+  </Step>
+</Steps>
+
+## Usage
+
+### XAML
+
+```xml
+<toolkit:MediaElement
+    x:Name="MediaElement"
+    Source="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+    ShouldAutoPlay="True"
+    ShouldLoopPlayback="False"
+    ShouldShowPlaybackControls="False"
+    ShouldKeepScreenOn="True"
+    Volume="1.0"
+    Speed="1.0"
+    Aspect="AspectFit"
+    MetadataTitle="Big Buck Bunny"
+    MetadataArtist="Blender Foundation"
+    MetadataArtworkUrl="https://example.com/artwork.jpg"
+    MediaOpened="OnMediaOpened"
+    MediaEnded="OnMediaEnded"
+    MediaFailed="OnMediaFailed"
+    StateChanged="OnStateChanged"
+    PositionChanged="OnPositionChanged"
+    SeekCompleted="OnSeekCompleted" />
+```
+
+### C# — playback control
+
+```csharp
+// Play
+mediaElement.Play();
+
+// Pause
+mediaElement.Pause();
+
+// Stop
+mediaElement.Stop();
+
+// Seek to a position
+await mediaElement.SeekTo(TimeSpan.FromSeconds(30));
+
+// Change source programmatically
+mediaElement.Source = MediaSource.FromUri("https://example.com/audio.mp3");
+```
+
+### C# — handling events
+
+```csharp
+void OnMediaOpened(object sender, EventArgs e)
+{
+    // Media is ready; Duration is now available
+    Console.WriteLine($"Duration: {mediaElement.Duration}");
+}
+
+void OnStateChanged(object sender, MediaStateChangedEventArgs e)
+{
+    Console.WriteLine($"State changed from {e.PreviousState} to {e.NewState}");
+}
+
+void OnPositionChanged(object sender, MediaPositionChangedEventArgs e)
+{
+    // Update a slider or label
+    positionSlider.Value = e.Position.TotalSeconds;
+}
+
+void OnMediaFailed(object sender, MediaFailedEventArgs e)
+{
+    Console.WriteLine($"Media failed: {e.ErrorMessage}");
+}
+```
+
+### C# — binding `Source` to different source types
+
+```csharp
+// Remote URI
+mediaElement.Source = MediaSource.FromUri("https://example.com/video.mp4");
+
+// Embedded resource
+mediaElement.Source = MediaSource.FromResource("video.mp4");
+
+// Local file
+mediaElement.Source = MediaSource.FromFile("/path/to/local/file.mp4");
+```
+
+## Properties
+
+<ParamField path="body.Source" type="MediaSource">
+  The source of the media. Accepts a URI string (via the `TypeConverter`), `MediaSource.FromUri()`, `MediaSource.FromResource()`, or `MediaSource.FromFile()`.
+</ParamField>
+
+<ParamField path="body.ShouldAutoPlay" type="bool" default="false">
+  When `true`, playback begins automatically when the source is set.
+</ParamField>
+
+<ParamField path="body.ShouldLoopPlayback" type="bool" default="false">
+  When `true`, the media restarts from the beginning when it ends.
+</ParamField>
+
+<ParamField path="body.ShouldShowPlaybackControls" type="bool" default="false">
+  When `true`, the platform's native playback controls (play, pause, seek) are shown.
+</ParamField>
+
+<ParamField path="body.ShouldKeepScreenOn" type="bool" default="false">
+  When `true`, the device screen stays on during playback.
+</ParamField>
+
+<ParamField path="body.ShouldMute" type="bool" default="false">
+  When `true`, audio is muted. The `Volume` property is unaffected.
+</ParamField>
+
+<ParamField path="body.Volume" type="double" default="1.0">
+  Audio volume, from `0.0` (silent) to `1.0` (full). Throws `ArgumentOutOfRangeException` if set outside this range.
+</ParamField>
+
+<ParamField path="body.Speed" type="double" default="1.0">
+  Playback speed multiplier. `1.0` is normal speed.
+</ParamField>
+
+<ParamField path="body.Aspect" type="Aspect" default="AspectFit">
+  Controls how video is scaled within the view bounds. One of `AspectFit`, `AspectFill`, or `Fill`.
+</ParamField>
+
+<ParamField path="body.Position" type="TimeSpan">
+  Read-only. The current playback position. Updates approximately every 200 ms.
+</ParamField>
+
+<ParamField path="body.Duration" type="TimeSpan">
+  Read-only. The total duration of the loaded media. Available after `MediaOpened` fires.
+</ParamField>
+
+<ParamField path="body.CurrentState" type="MediaElementState">
+  Read-only. The current playback state. See `MediaElementState` values below.
+</ParamField>
+
+<ParamField path="body.MediaWidth" type="int">
+  Read-only. The width of the video in pixels.
+</ParamField>
+
+<ParamField path="body.MediaHeight" type="int">
+  Read-only. The height of the video in pixels.
+</ParamField>
+
+<ParamField path="body.MetadataTitle" type="string" default='""'>
+  Title displayed in lock screen / notification media controls.
+</ParamField>
+
+<ParamField path="body.MetadataArtist" type="string" default='""'>
+  Artist name displayed in lock screen / notification media controls.
+</ParamField>
+
+<ParamField path="body.MetadataArtworkUrl" type="string" default='""'>
+  URL of artwork displayed in lock screen / notification media controls.
+</ParamField>
+
+## MediaElementState enum
+
+| Value       | Description                                   |
+|-------------|-----------------------------------------------|
+| `None`      | No state or state unknown.                    |
+| `Opening`   | The media source is being opened.             |
+| `Buffering` | The media is being buffered for playback.     |
+| `Playing`   | The media is currently playing.               |
+| `Paused`    | Playback has been paused.                     |
+| `Stopped`   | Playback has been stopped.                    |
+| `Failed`    | The media failed to open or play.             |
+
+## Events
+
+| Event             | Args type                     | Description                                        |
+|-------------------|-------------------------------|----------------------------------------------------|
+| `MediaOpened`     | `EventArgs`                   | Fired when the media source is opened successfully. |
+| `MediaEnded`      | `EventArgs`                   | Fired when playback reaches the end of the media.  |
+| `MediaFailed`     | `MediaFailedEventArgs`        | Fired when the media fails to load or play. Contains `ErrorMessage`. |
+| `StateChanged`    | `MediaStateChangedEventArgs`  | Fired when `CurrentState` changes. Contains `PreviousState` and `NewState`. |
+| `PositionChanged` | `MediaPositionChangedEventArgs` | Fired periodically with the current `Position`. |
+| `SeekCompleted`   | `EventArgs`                   | Fired when a `SeekTo` operation completes.         |
+
+## Platform support
+
+| Platform | Audio | Video |
+|----------|-------|-------|
+| Android  | Yes   | Yes   |
+| iOS      | Yes   | Yes   |
+| macOS    | Yes   | Yes   |
+| Windows  | Yes   | Yes   |
+
+<Warning>
+  `MediaElement` implements `IDisposable`. Always call `Dispose()` or let the page lifecycle handle cleanup to release platform media resources.
+</Warning>
+
+<Note>
+  On Android, set `AndroidViewType` to configure whether the underlying view uses `SurfaceView` or `TextureView`. `IsAndroidForegroundServiceEnabled` can be set to enable background playback via a foreground service.
+</Note>

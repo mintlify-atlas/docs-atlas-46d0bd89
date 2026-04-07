@@ -1,0 +1,85 @@
+---
+title: "Code Standards"
+description: "Coding conventions and best practices used in the .NET MAUI Community Toolkit."
+---
+
+Following these conventions keeps the codebase consistent and makes reviews faster.
+
+## Project structure
+
+| Project | Purpose |
+|---|---|
+| `CommunityToolkit.Maui.Core` | Base classes, interfaces, primitives, handlers, and platform-independent code. All types must be `public`. |
+| `CommunityToolkit.Maui` | Controls, behaviors, converters, layouts — references Core. MVVM-friendly. |
+| `CommunityToolkit.Maui.MediaElement` | Audio/video playback control |
+| `CommunityToolkit.Maui.Camera` | Camera capture control |
+| `CommunityToolkit.Maui.Maps` | Map control extensions |
+
+**Rule:** If code can be shared across frameworks (not tied to .NET MAUI's binding/behavior model), put it in `Core`. If it uses MAUI-specific features like `BindableProperty` or `Behavior<T>`, put it in the main `CommunityToolkit.Maui` project.
+
+## Async code
+
+- Always include `CancellationToken` as a parameter on every method returning `Task` or `ValueTask`
+- Public methods: provide a default value — `CancellationToken token = default`
+- Internal/private methods: no default value
+- Call `token.ThrowIfCancellationRequested()` at the start of methods that support cancellation
+
+```csharp
+// Correct
+public async Task LoadAsync(CancellationToken token = default)
+{
+    token.ThrowIfCancellationRequested();
+    // ...
+}
+
+// Incorrect — missing CancellationToken
+public async Task LoadAsync()
+{
+    // ...
+}
+```
+
+## Enums
+
+- Use `Unknown` at index 0 for return types that may have an unknown value
+- Use `Default` at index 0 for option types that represent the system default
+- Assign explicit integer values (0, 1, 2, …) to all members
+- Use singular names: `SensorSpeed` not `SensorSpeeds`
+
+## Logging
+
+Always use `Trace.WriteLine()` for debug output — never `Debug.WriteLine()`, which is stripped in Release builds:
+
+```csharp
+// Correct
+Trace.WriteLine($"Animation error: {ex.Message}");
+
+// Incorrect
+Debug.WriteLine($"Animation error: {ex.Message}");
+```
+
+## Formatting
+
+- **Indentation:** Tabs (not spaces)
+- **Braces:** Allman style (opening brace on its own line)
+- Follow the `.editorconfig` at the repository root
+
+## Bindable properties
+
+Use the `[BindableProperty]` source generator attribute for .NET MAUI controls and behaviors:
+
+```csharp
+[BindableProperty]
+public partial Color TintColor { get; set; }
+```
+
+## Tests
+
+Every new public API requires unit tests in `CommunityToolkit.Maui.UnitTests`. Tests should cover:
+- Default property values
+- Property changed callbacks
+- Edge cases and null inputs
+
+## Sample app
+
+Every feature must have a corresponding page in `samples/CommunityToolkit.Maui.Sample`. The sample should demonstrate the primary use case clearly with minimal boilerplate.

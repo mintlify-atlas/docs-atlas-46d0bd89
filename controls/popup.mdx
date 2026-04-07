@@ -1,0 +1,239 @@
+---
+title: 'Popup'
+description: 'A lightweight overlay that displays custom content above the current page using the modal navigation stack.'
+---
+
+`Popup` is a view that presents custom content as a modal overlay above the current page. It supports returning typed results, customizable appearance via `PopupOptions`, and both fire-and-forget and awaitable display patterns.
+
+<Info>
+  Popup is part of the core `CommunityToolkit.Maui` NuGet package. Make sure you have called `.UseMauiCommunityToolkit()` in your `MauiProgram.cs`.
+</Info>
+
+## Installation
+
+<Steps>
+  <Step title="Install the NuGet package">
+    ```bash
+    dotnet add package CommunityToolkit.Maui
+    ```
+  </Step>
+  <Step title="Initialize the toolkit">
+    ```csharp
+    var builder = MauiApp.CreateBuilder();
+    builder
+        .UseMauiApp<App>()
+        .UseMauiCommunityToolkit();
+    ```
+  </Step>
+  <Step title="Register popups with the service collection">
+    Register popup views (and optionally their ViewModels) so they can be resolved via `IPopupService`:
+
+    ```csharp
+    builder.Services.AddTransientPopup<MyPopup, MyPopupViewModel>();
+    // or without a separate ViewModel:
+    builder.Services.AddTransientPopup<MyPopup>();
+    ```
+  </Step>
+</Steps>
+
+## Usage
+
+### XAML
+
+Define a popup as a content view that inherits from `Popup`:
+
+```xml
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               x:Class="MyApp.Views.MyPopup"
+               CanBeDismissedByTappingOutsideOfPopup="True"
+               HorizontalOptions="Center"
+               VerticalOptions="Center">
+    <VerticalStackLayout Padding="24" Spacing="16">
+        <Label Text="Hello from Popup!" FontSize="18" />
+        <Button Text="Close" Clicked="OnCloseButtonClicked" />
+    </VerticalStackLayout>
+</toolkit:Popup>
+```
+
+Code-behind:
+
+```csharp
+public partial class MyPopup : Popup
+{
+    public MyPopup()
+    {
+        InitializeComponent();
+    }
+
+    async void OnCloseButtonClicked(object sender, EventArgs e)
+    {
+        await CloseAsync();
+    }
+}
+```
+
+### XAML — popup with a typed result
+
+When your popup needs to return a value, inherit from `Popup<T>`:
+
+```csharp
+public partial class ReturnResultPopup : Popup<string>
+{
+    public ReturnResultPopup()
+    {
+        InitializeComponent();
+    }
+
+    async void OnConfirmClicked(object sender, EventArgs e)
+    {
+        await CloseAsync("User confirmed");
+    }
+}
+```
+
+### C# — showing a popup via extension methods
+
+```csharp
+// Fire-and-forget (non-awaitable)
+this.ShowPopup(new MyPopup());
+
+// Await the result
+var result = await this.ShowPopupAsync(new MyPopup());
+if (!result.WasDismissedByTappingOutsideOfPopup)
+{
+    // handle result
+}
+
+// With typed result
+var result = await this.ShowPopupAsync<string>(new ReturnResultPopup());
+Console.WriteLine(result.Result); // "User confirmed"
+```
+
+### C# — showing a popup via `IPopupService`
+
+`IPopupService` resolves popups from the DI container and can be used from ViewModels:
+
+```csharp
+// Show popup awaiting result, using INavigation
+var result = await popupService.ShowPopupAsync<MyPopupViewModel>(Navigation);
+
+// Show popup using Shell navigation with Shell parameters
+var queryAttributes = new Dictionary<string, object>
+{
+    ["DescriptionLabel"] = "Text passed via IQueryAttributable"
+};
+await popupService.ShowPopupAsync<MyPopup>(Shell.Current, new PopupOptions
+{
+    Shape = new RoundRectangle { CornerRadius = new CornerRadius(4) }
+}, queryAttributes, CancellationToken.None);
+
+// Show popup with typed result using ViewModel mapping
+var result = await popupService.ShowPopupAsync<MyPopupViewModel, string>(Navigation);
+```
+
+### C# — closing a popup externally
+
+```csharp
+// Close the topmost popup from any page or service
+await this.ClosePopupAsync();
+
+// Close and pass a result
+await this.ClosePopupAsync("result value");
+```
+
+### C# — customizing appearance with `PopupOptions`
+
+```csharp
+await this.ShowPopupAsync(new MyPopup(), new PopupOptions
+{
+    CanBeDismissedByTappingOutsideOfPopup = false,
+    PageOverlayColor = Color.FromArgb("#80000000"),
+    Shape = new RoundRectangle
+    {
+        CornerRadius = new CornerRadius(20),
+        StrokeThickness = 2,
+        Stroke = Colors.Blue
+    },
+    OnTappingOutsideOfPopup = () => Console.WriteLine("Tapped outside")
+});
+```
+
+## Popup properties
+
+<ParamField path="body.CanBeDismissedByTappingOutsideOfPopup" type="bool" default="true">
+  When `true`, tapping outside the popup dismisses it. On Android, setting this to `false` also disables the hardware back button. Dismissal only occurs when **both** the `Popup` and `PopupOptions` values are `true`.
+</ParamField>
+
+<ParamField path="body.HorizontalOptions" type="LayoutOptions" default="Center">
+  Controls the horizontal position of the popup on screen.
+</ParamField>
+
+<ParamField path="body.VerticalOptions" type="LayoutOptions" default="Center">
+  Controls the vertical position of the popup on screen.
+</ParamField>
+
+<ParamField path="body.Margin" type="Thickness">
+  The margin between the popup and the edge of the window.
+</ParamField>
+
+<ParamField path="body.Padding" type="Thickness">
+  The padding between the popup border and its content.
+</ParamField>
+
+<ParamField path="body.BackgroundColor" type="Color">
+  The background color of the popup container.
+</ParamField>
+
+## PopupOptions properties
+
+<ParamField path="body.CanBeDismissedByTappingOutsideOfPopup" type="bool" default="true">
+  See the `Popup` property of the same name. Both must be `true` for tapping outside to dismiss.
+</ParamField>
+
+<ParamField path="body.PageOverlayColor" type="Color">
+  The color of the semi-transparent overlay behind the popup.
+</ParamField>
+
+<ParamField path="body.Shape" type="Shape">
+  A `Shape` (e.g. `RoundRectangle`) applied to the popup border, controlling its outline, corner radius, and stroke.
+</ParamField>
+
+<ParamField path="body.Shadow" type="Shadow">
+  A `Shadow` applied to the popup border.
+</ParamField>
+
+<ParamField path="body.OnTappingOutsideOfPopup" type="Action">
+  An action invoked when the user taps outside the popup, before dismissal occurs.
+</ParamField>
+
+## Events
+
+| Event    | Description                                      |
+|----------|--------------------------------------------------|
+| `Opened` | Fired when the popup is displayed on screen.     |
+| `Closed` | Fired when the popup is removed from the screen. |
+
+## IPopupResult
+
+All awaitable show-popup methods return `IPopupResult` (or `IPopupResult<T>`):
+
+| Member                              | Description                                              |
+|-------------------------------------|----------------------------------------------------------|
+| `WasDismissedByTappingOutsideOfPopup` | `true` if the user tapped the overlay to close the popup. |
+| `Result` (generic overload)         | The value passed to `CloseAsync(T result)`.              |
+
+## Platform support
+
+| Platform | Supported |
+|----------|-----------|
+| Android  | Yes       |
+| iOS      | Yes       |
+| macOS    | Yes       |
+| Windows  | Yes       |
+
+<Note>
+  On iOS and macOS, the popup is presented using `UIModalPresentationStyle.OverFullScreen` to ensure it covers the entire screen including safe areas.
+</Note>
